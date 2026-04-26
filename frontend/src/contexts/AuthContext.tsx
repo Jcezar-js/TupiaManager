@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthState } from '../types/index';
+import type { AuthState } from '../types/index';
 
 interface AuthContextType extends AuthState {
   login: (token: string) => void;

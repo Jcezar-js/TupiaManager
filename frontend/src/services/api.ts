@@ -1,4 +1,4 @@
-import { ApiError } from '../types/index';
+import type { ApiError } from '../types/index';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -9,10 +9,13 @@ export async function apiFetch<T>(
   const url = `${API_URL}${path}`;
   const token = sessionStorage.getItem('auth_token');
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
   };
+
+  if (typeof options.headers === 'object' && options.headers !== null) {
+    Object.assign(headers, options.headers);
+  }
 
   if (token) {
     headers.Authorization = `Bearer ${token}`;
