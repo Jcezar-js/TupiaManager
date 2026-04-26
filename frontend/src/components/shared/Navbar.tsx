@@ -10,22 +10,31 @@ export function Navbar() {
         Marcenaria do Gaúderio
       </Link>
 
-      {token && (
-        <div className="flex gap-6 items-center">
-          <Link to="/admin/materials" className="hover:text-blue-100">
-            Materiais
-          </Link>
-          <Link to="/admin/products" className="hover:text-blue-100">
-            Produtos
-          </Link>
-          <button
-            onClick={logout}
-            className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded"
+      <div className="flex gap-6 items-center">
+        {token ? (
+          <>
+            <Link to="/admin/materials" className="hover:text-blue-100">
+              Materiais
+            </Link>
+            <Link to="/admin/products" className="hover:text-blue-100">
+              Produtos
+            </Link>
+            <button
+              onClick={logout}
+              className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded"
+            >
+              Sair
+            </button>
+          </>
+        ) : (
+          <Link
+            to="/login"
+            className="bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded font-medium"
           >
-            Sair
-          </button>
-        </div>
-      )}
+            Entrar
+          </Link>
+        )}
+      </div>
     </nav>
   );
 }
