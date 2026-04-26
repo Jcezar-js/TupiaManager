@@ -10,7 +10,7 @@ cloudinary.config({
 
 const storage = CloudinaryStorage({
   cloudinary,
-  folder: 'marcenaria-flaco-produtos',
+  folder: 'nexus-admin-produtos',
   allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   public_id: (_req: any, file: any) => file.originalname.split('.')[0] + '-' + Date.now(),
 });

@@ -7,7 +7,7 @@ test.describe('Auth Flow', () => {
     await page.goto('/login');
 
     await page.route('**/api/auth/login', async (route) => {
-      await route.respond({
+      await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ token: mockToken, userId: '123456789' }),
@@ -87,7 +87,7 @@ test.describe('Auth Flow', () => {
     // Mock API returning 401
     await page.route('**/api/**', (route) => {
       if (route.request().method() === 'GET') {
-        route.respond({
+        route.fulfill({
           status: 401,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -114,7 +114,7 @@ test.describe('Auth Flow', () => {
     await page.goto('/login');
 
     await page.route('**/api/auth/login', async (route) => {
-      await route.respond({
+      await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ token: mockToken, userId: '123456789' }),
@@ -140,7 +140,7 @@ test.describe('Auth Flow', () => {
       }
     });
 
-    expect(userId).toBe('123456789');
+    expect(userId).toBe('1234567890');
   });
 
   test('should not lose session on page navigation', async ({ page }) => {

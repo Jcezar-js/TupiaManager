@@ -8,12 +8,12 @@ export function ErrorDisplay({ errors }: ErrorDisplayProps) {
   }
 
   return (
-    <div className="bg-red-50 border border-red-200 rounded p-4">
+    <div className="alert alert-danger py-2">
       {Object.entries(errors).map(([field, messages]) => (
-        <div key={field} className="mb-2">
-          <p className="text-sm font-medium text-red-600 capitalize">{field}</p>
+        <div key={field}>
+          <p className="mb-0 fw-semibold text-capitalize">{field}</p>
           {messages.map((msg, idx) => (
-            <p key={idx} className="text-sm text-red-500">
+            <p key={idx} className="mb-0 small">
               • {msg}
             </p>
           ))}

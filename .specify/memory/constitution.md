@@ -23,7 +23,7 @@ Follow-up TODOs:
   None — all placeholders resolved from codebase context.
 -->
 
-# Marcenaria do Gaúdério API Constitution
+# NexusAdmin API Constitution
 
 ## Core Principles
 

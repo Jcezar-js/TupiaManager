@@ -4,42 +4,20 @@ export interface AuthState {
   userId: string | null;
 }
 
-// Material
-export type MaterialCategory =
-  | 'MDF'
-  | 'Madeira Maciça'
-  | 'Compensado'
-  | 'Aglomerado'
-  | 'Metal'
-  | 'Vidro'
-  | 'Plástico'
-  | 'Tecido'
-  | 'Couro'
-  | 'Espuma'
-  | 'Ferragem';
-
-export type MaterialUnit = 'm2' | 'm' | 'unidade' | 'kg' | 'litro';
-
-export interface Material {
-  _id: string;
-  name: string;
-  category: MaterialCategory;
-  unit: MaterialUnit;
-  pricePerUnit: number;
-  wasteFactor: number;
-  createdBy?: string;
-  updatedBy?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface MaterialFormData {
-  name: string;
-  category: MaterialCategory | '';
-  unit: MaterialUnit | '';
-  pricePerUnit: number | '';
-  wasteFactor: number | '';
-}
+// Material — re-export from dedicated material types
+export type {
+  Material,
+  MaterialCategory,
+  MaterialUnit,
+  MaterialFormData,
+} from './material';
+export {
+  MaterialFormSchema,
+  MaterialCategoryEnum,
+  MaterialUnitEnum,
+  MATERIAL_CATEGORIES,
+  MATERIAL_UNITS,
+} from './material';
 
 // Product
 export interface Component {

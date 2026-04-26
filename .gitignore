@@ -9,6 +9,6 @@ test-results/
 .cursor/rules/Rebuilt.mdc
 .CHANGELOG.md
 .claude/
-.specify/ 
+.specify/
 specs/
-.playwright/
+scripts/create_admin.ts

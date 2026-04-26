@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-REST API for a custom carpentry business ("Marcenaria do Gaúdério"). The core feature is a pricing engine that calculates furniture quotes based on customer-supplied dimensions and a bill of materials defined per product.
+REST API for NexusAdmin - a pricing engine and administrative system that calculates furniture quotes based on customer-supplied dimensions and a bill of materials defined per product.
 
 ## Commands
 
@@ -79,7 +79,7 @@ Every controller validates with `zod.safeParse()` before touching the database. 
 
 ### Image upload
 
-[controllers/config/multer.ts](controllers/config/multer.ts) configures Multer with `CloudinaryStorage`. Uploaded files are stored in Cloudinary folder `marcenaria-flaco-produtos`. The `file.path` returned by Cloudinary is the public URL stored in `product.photos`.
+[controllers/config/multer.ts](controllers/config/multer.ts) configures Multer with `CloudinaryStorage`. Uploaded files are stored in Cloudinary folder `nexus-admin-produtos`. The `file.path` returned by Cloudinary is the public URL stored in `product.photos`.
 
 ### Models
 

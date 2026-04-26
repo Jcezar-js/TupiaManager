@@ -1,1 +1,28 @@
-@import "tailwindcss";
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --admin-sidebar-bg: #2c2e33;
+  --admin-topbar-bg: #343a40;
+  --admin-content-bg: #f0f0f0;
+  --admin-accent: #7c5cbf;
+  --admin-sidebar-width: 220px;
+  --admin-topbar-height: 60px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f0f0f0;
+  color: #343a40;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}

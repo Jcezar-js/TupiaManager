@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
+import { BsHammer } from 'react-icons/bs';
 import { login } from '../services/auth.service';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -19,11 +20,6 @@ const containerVariants = {
       delayChildren: 0.2,
     },
   },
-  exit: {
-    opacity: 0,
-    scale: 0.8,
-    transition: { duration: 0.4 },
-  },
 };
 
 const itemVariants = {
@@ -31,14 +27,7 @@ const itemVariants = {
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.5, ease: 'easeOut' },
-  },
-};
-
-const shakeVariants = {
-  shake: {
-    x: [-10, 10, -10, 10, 0],
-    transition: { duration: 0.4 },
+    transition: { duration: 0.5 },
   },
 };
 
@@ -88,117 +77,87 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-purple-900 to-slate-950 flex items-center justify-center p-4 overflow-hidden">
+    <div className="bg-dark vh-100 d-flex align-items-center justify-content-center p-4">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        exit="exit"
-        className="w-full max-w-md"
+        style={{ maxWidth: '400px', width: '100%' }}
       >
         <motion.div
-          variants={shakeVariants}
-          animate={shake ? 'shake' : 'initial'}
-          className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-8 space-y-8"
+          animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.4 }}
+          className="card shadow-lg"
         >
-          {/* Title */}
-          <motion.div variants={itemVariants} className="text-center space-y-2">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Marcenaria do Gaúderio
-            </h1>
-            <p className="text-sm text-gray-300">Painel de Administração</p>
-          </motion.div>
-
-          {/* Error Alert */}
-          {apiError && (
-            <motion.div
-              variants={itemVariants}
-              className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-200 text-sm backdrop-blur-sm"
-            >
-              {apiError}
+          <div className="card-body p-5">
+            <motion.div variants={itemVariants} className="text-center mb-4">
+              <BsHammer size={40} className="text-primary mb-2" style={{ margin: '0 auto', display: 'block' }} />
+              <h1 className="card-title h4 fw-bold mb-1">NexusAdmin</h1>
+              <p className="text-muted small">Painel de Administração</p>
             </motion.div>
-          )}
 
-          {/* Form */}
-          <motion.form onSubmit={handleSubmit} className="space-y-4" variants={itemVariants}>
-            {/* Email */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Email
-              </label>
-              <motion.input
-                whileFocus={{ scale: 1.02 }}
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-400/50 focus:ring-2 focus:ring-indigo-400/20 transition-all duration-300"
-                placeholder="seu@email.com"
+            {apiError && (
+              <motion.div variants={itemVariants} className="alert alert-danger alert-dismissible fade show" role="alert">
+                {apiError}
+              </motion.div>
+            )}
+
+            <motion.form onSubmit={handleSubmit} variants={itemVariants}>
+              <div className="mb-3">
+                <label htmlFor="email" className="form-label">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={`form-control form-control-lg ${errors.email ? 'is-invalid' : ''}`}
+                  placeholder="seu@email.com"
+                  disabled={loading}
+                />
+                {errors.email && <div className="invalid-feedback d-block">{errors.email[0]}</div>}
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">
+                  Senha
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`form-control form-control-lg ${errors.password ? 'is-invalid' : ''}`}
+                  placeholder="••••••••"
+                  disabled={loading}
+                />
+                {errors.password && <div className="invalid-feedback d-block">{errors.password[0]}</div>}
+              </div>
+
+              <motion.button
+                variants={itemVariants}
+                type="submit"
                 disabled={loading}
-              />
-              {errors.email && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-xs text-red-300"
-                >
-                  {errors.email[0]}
-                </motion.p>
-              )}
-            </div>
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="btn btn-primary w-100 btn-lg"
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Autenticando...
+                  </>
+                ) : (
+                  'Entrar'
+                )}
+              </motion.button>
+            </motion.form>
 
-            {/* Password */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Senha
-              </label>
-              <motion.input
-                whileFocus={{ scale: 1.02 }}
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-400/50 focus:ring-2 focus:ring-indigo-400/20 transition-all duration-300"
-                placeholder="••••••••"
-                disabled={loading}
-              />
-              {errors.password && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-xs text-red-300"
-                >
-                  {errors.password[0]}
-                </motion.p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <motion.button
-              variants={itemVariants}
-              type="submit"
-              disabled={loading}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full mt-6 py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-indigo-500/50"
-            >
-              {loading ? (
-                <motion.span
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  className="flex items-center justify-center"
-                >
-                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  Autenticando...
-                </motion.span>
-              ) : (
-                'Entrar'
-              )}
-            </motion.button>
-          </motion.form>
-
-          {/* Footer */}
-          <motion.p variants={itemVariants} className="text-center text-xs text-gray-400">
-            Desenvolvido com ❤️ para a Marcenaria do Gaúderio
-          </motion.p>
+            <motion.p variants={itemVariants} className="text-center text-muted small mt-4">
+              Desenvolvido com ❤️ para NexusAdmin
+            </motion.p>
+          </div>
         </motion.div>
       </motion.div>
     </div>
