@@ -1,13 +1,22 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/shared/Navbar';
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
+import { useAuth } from './contexts/AuthContext';
+import { LoginPage } from './pages/LoginPage';
 
 // Placeholder pages (to be created in later phases)
-const LoginPage = () => <div className="p-4">Login Page</div>;
 const CatalogPage = () => <div className="p-4">Catalog Page</div>;
 const ProductDetailPage = () => <div className="p-4">Product Detail Page</div>;
 const MaterialsPage = () => <div className="p-4">Materials Page</div>;
 const ProductsPage = () => <div className="p-4">Products Page</div>;
+
+function LoginRoute() {
+  const { token } = useAuth();
+  if (token) {
+    return <Navigate to="/admin/materials" replace />;
+  }
+  return <LoginPage />;
+}
 
 function App() {
   return (
@@ -15,7 +24,7 @@ function App() {
       <Navbar />
       <main className="container mx-auto">
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginRoute />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/catalog/:id" element={<ProductDetailPage />} />
 
