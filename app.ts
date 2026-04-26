@@ -9,7 +9,7 @@ import helmet from 'helmet';
 const app = express();
 
 //origens permitidas CORS
-const allowed_origins = ['http://localhost:12000', 'http://localhost:12001'];
+const allowed_origins = process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:12000', 'http://localhost:12001'];
 
 const options: cors.CorsOptions = {
   origin: allowed_origins,
@@ -17,7 +17,7 @@ const options: cors.CorsOptions = {
 
 
 
-//middleware para parsear o corpo da requisição
+//middleware para parsear o corpo da requisiï¿½ï¿½o
 app.use(express.json());
 //middleware para permitir CORS
 
@@ -26,7 +26,7 @@ app.use(helmet());
 
 //usar as rotas de produtos
 app.use('/api/products', products_router);
-//usar as rotas de autenticação
+//usar as rotas de autenticaï¿½ï¿½o
 app.use('/api/auth', auth_router);
 //usar as rotas de materiais
 app.use('/api/materials', material_router);

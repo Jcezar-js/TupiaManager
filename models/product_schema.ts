@@ -6,7 +6,7 @@ const componentSchema = new mongoose.Schema({
     ref: 'Material',
     required: true
   },
-  // O marceneiro define: "Para este móvel, gasto X unidades deste material por cada m2 de área frontal"
+  // O marceneiro define: "Para este mï¿½vel, gasto X unidades deste material por cada m2 de ï¿½rea frontal"
   // ou "Gasto X unidades fixas independente do tamanho
   quantityType:{
     type: String,
@@ -36,8 +36,10 @@ const productSchema = new mongoose.Schema({
 
   components: [componentSchema],
 
-  baseLaborCost: {type: Number, required: true}, //Mão de obra base
-  profitMargin: {type: Number, default: 50}, // margem de lucro em  % 
+  baseLaborCost: {type: Number, required: true}, //Mï¿½o de obra base
+  profitMargin: {type: Number, default: 50}, // margem de lucro em  %
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, {timestamps: true})
 
 export interface IProduct extends Document {
@@ -62,5 +64,7 @@ export interface IProduct extends Document {
   isFeatured: boolean;
 }
 
+
+productSchema.index({ name: 'text', description: 'text' });
 
 export default mongoose.model<IProduct>('Product', productSchema)

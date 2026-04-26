@@ -7,7 +7,7 @@ const materialSchema = new mongoose.Schema({
   },
   category:{
     type:String,
-    enum: ['MDF', 'Madeira Maciça', 'Compensado', 'Aglomerado', 'Metal', 'Vidro', 'Plástico', 'Tecido', 'Couro', 'Espuma', 'Ferragem'],
+    enum: ['MDF', 'Madeira Maciï¿½a', 'Compensado', 'Aglomerado', 'Metal', 'Vidro', 'Plï¿½stico', 'Tecido', 'Couro', 'Espuma', 'Ferragem'],
     required: true
   },
   unit:{
@@ -22,8 +22,12 @@ const materialSchema = new mongoose.Schema({
   wasteFactor:{
     type: Number,
     default: 1.10,
-    help: "Multiplicador de segurança para perca de material no corte"
-  }
+    help: "Multiplicador de seguranï¿½a para perca de material no corte"
+  },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, {timestamps: true});
+
+materialSchema.index({ name: 'text' });
 
 export default mongoose.model('Material', materialSchema)

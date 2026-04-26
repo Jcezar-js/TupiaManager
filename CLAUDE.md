@@ -86,3 +86,8 @@ Every controller validates with `zod.safeParse()` before touching the database. 
 - **User** ([models/user_schema.ts](models/user_schema.ts)) — `pre('save')` hook hashes password with bcrypt (salt 10). No role field; authorization is all-or-nothing via JWT presence.
 - **Material** ([models/material_schema.ts](models/material_schema.ts)) — `category` and `unit` are enum-constrained. `wasteFactor` defaults to 1.10.
 - **Product** ([models/product_schema.ts](models/product_schema.ts)) — embeds `constraints` (min/max height/width/depth in mm) and `components` (sub-documents without `_id`, referencing Material by ObjectId).
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
