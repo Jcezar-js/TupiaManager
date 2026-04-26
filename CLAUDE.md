@@ -2,68 +2,92 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Project
 
-REST API for a carpentry shop (Marcenaria do Gaúderio) built with Node.js, TypeScript, Express 5, and MongoDB (Mongoose). Allows customers to get price quotes for custom furniture based on dimensions, and allows admins to manage products and materials.
+REST API for a custom carpentry business ("Marcenaria do Gaúdério"). The core feature is a pricing engine that calculates furniture quotes based on customer-supplied dimensions and a bill of materials defined per product.
 
-## Development Commands
+## Commands
 
+**Start dev server** (hot-reload via ts-node-dev):
 ```bash
-# Install dependencies
-npm install
-
-# Start dev server with hot-reload (ts-node-dev)
 npm run devStart
+```
 
-# Start MongoDB via Docker
+**Start MongoDB** (required before running the API):
+```bash
 sudo docker-compose up -d
+```
 
-# Create the first admin user (run once, requires .env configured)
+**Create first admin user** (run once after DB is up and `.env` is configured):
+```bash
 npx ts-node scripts/create_admin.ts
 ```
 
-There are no lint or test scripts configured.
+There is no build, lint, or test script configured.
 
-## Environment Setup
+## Environment Variables
 
 Copy `.env.example` to `.env`. Required variables:
-- `PORT` — server port (default 3001)
-- `DATABASE_URL` — MongoDB connection string (e.g. `mongodb://root:examplepassword@localhost:27017/landing-page?authSource=admin`)
-- `JWT_SECRET` — JWT signing secret
-- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` — required for product photo uploads
-- `ADMIN_EMAIL`, `ADMIN_PASSWORD` — used by the admin creation script
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | MongoDB connection string (e.g. `mongodb://root:examplepassword@localhost:27017/landing-page?authSource=admin`) |
+| `JWT_SECRET` | Secret for signing JWT tokens |
+| `PORT` | Server port (default 3001) |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Required for product photo upload; routes that call `upload.array()` will fail without these |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Used only by the admin creation script |
+
+CORS allows only `http://localhost:12000` and `http://localhost:12001` (hardcoded in [app.ts](app.ts)).
 
 ## Architecture
 
-**Entry points:**
-- `server.ts` — loads `.env`, connects to MongoDB, starts Express
-- `app.ts` — configures Express (CORS, Helmet, routes, global error handler)
+**Entry point flow:** `server.ts` loads dotenv, connects Mongoose, starts Express using the app exported from `app.ts`.
 
-**Request flow:** Route → (rate limiter) → (auth middleware) → Controller → Model/Service → Error middleware
+**Request flow:** `app.ts` → `routes/` → `controllers/` → `models/` or `services/`
 
-**Three resource groups:**
-- `/api/auth` — register, login, update password
-- `/api/products` — CRUD for furniture products; public reads, protected writes; `POST /quote/:id` returns dynamic price estimate
-- `/api/materials` — CRUD for raw materials; all routes require auth
+### Routes & access control
 
-**Pricing logic** (`services/pricing_service.ts`): Calculates product price by iterating over `components` (each links a `Material` + `quantityType` + `quantityFactor`). Three quantity modes:
-- `fixed` — flat quantity regardless of size
+| Prefix | File | Auth required |
+|---|---|---|
+| `/api/auth` | [routes/auth_routes.ts](routes/auth_routes.ts) | Only `PATCH /updatepsw/:id` |
+| `/api/products` | [routes/product_routes.ts](routes/product_routes.ts) | Only write operations and `POST /quote/:id` is public |
+| `/api/materials` | [routes/material_routes.ts](routes/material_routes.ts) | All routes (router-level middleware) |
+
+All routers apply `rate_limiter` (100 req / 15 min). The login route adds an extra stricter limiter (5 req / 50 sec).
+
+### Pricing engine
+
+[services/pricing_service.ts](services/pricing_service.ts) is the core domain logic. A product stores a `components` array, where each component references a `Material` and defines how its quantity is computed:
+
+- `fixed` — constant quantity regardless of dimensions
 - `area_based` — quantity × (height × width in m²)
-- `perimeter_based` — quantity × (perimeter in meters)
+- `perimeter_based` — quantity × (2 × (height + width) in metres)
 
-Final price = (material costs × waste factors + `baseLaborCost`) × (1 + `profitMargin` / 100)
+Each component's raw consumption is multiplied by `material.wasteFactor` (default 1.10). Final price = `(totalMaterialCost + baseLaborCost) × (1 + profitMargin / 100)`.
 
-**Validation:** Zod schemas are defined inline in each controller. Use `safeParse` and return `error.flatten().fieldErrors` on failure.
+### Error handling pattern
 
-**Error handling:** All controllers pass errors to `next(err)`. Use `app_error_class` (from `middlewares/error_handling_middleware.ts`) for operational errors with a status code. The global error handler in `app.ts` handles `app_error_class`, Mongoose `CastError`, and duplicate key (`11000`) errors.
+Throw `new app_error_class(message, statusCode)` from any controller or service. The global `error_handling_middleware` in [middlewares/error_handling_middleware.ts](middlewares/error_handling_middleware.ts) catches it and returns a JSON response. Never call `res.status(...).json(...)` directly for errors — always use `next(new app_error_class(...))`.
 
-**Auth:** JWT Bearer token. The `auth_middleware` attaches `userId` to `req` as `AuthRequest`. Use `AuthRequest` type when accessing `req.userId` in protected controllers.
+### Validation pattern
 
-**File uploads:** Multer + Cloudinary (`controllers/config/multer.ts`). Products accept up to 5 photos via `upload.array('photos', 5)`.
+Every controller validates with `zod.safeParse()` before touching the database. Zod schemas are defined at the top of each controller file. Use `.flatten()` on `ZodError` to extract `fieldErrors` for the response body.
 
-## Conventions
+### Authentication
 
-- Naming: `snake_case` for all functions, variables, and file names
-- Models export both the Mongoose model (default) and a TypeScript interface (e.g. `IProduct`)
-- Rate limiters are applied per-router: general (`rate_limiter`) on all routes, stricter (`rate_limiter_login`) on `POST /login`
-- CORS is restricted to `localhost:12000` and `localhost:12001`
+[middlewares/auth_middleware.ts](middlewares/auth_middleware.ts) extracts the Bearer token from `Authorization` header, verifies it with `JWT_SECRET`, and attaches `req.userId`. The `AuthRequest` interface extends `Request` to expose `userId`.
+
+### Image upload
+
+[controllers/config/multer.ts](controllers/config/multer.ts) configures Multer with `CloudinaryStorage`. Uploaded files are stored in Cloudinary folder `marcenaria-flaco-produtos`. The `file.path` returned by Cloudinary is the public URL stored in `product.photos`.
+
+### Models
+
+- **User** ([models/user_schema.ts](models/user_schema.ts)) — `pre('save')` hook hashes password with bcrypt (salt 10). No role field; authorization is all-or-nothing via JWT presence.
+- **Material** ([models/material_schema.ts](models/material_schema.ts)) — `category` and `unit` are enum-constrained. `wasteFactor` defaults to 1.10.
+- **Product** ([models/product_schema.ts](models/product_schema.ts)) — embeds `constraints` (min/max height/width/depth in mm) and `components` (sub-documents without `_id`, referencing Material by ObjectId).
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->

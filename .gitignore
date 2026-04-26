@@ -1,8 +1,12 @@
 .env
 node_modules
+tests/.auth-state.json
+playwright-report/
+.playwright/
+test-results/
 .cursor/rules
 .cursor/workspace.code-workspace
 .cursor/rules/Rebuilt.mdc
 .CHANGELOG.md
-.vscode
+.claude/
 

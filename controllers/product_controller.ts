@@ -3,6 +3,7 @@ import Product from '../models/product_schema';
 import { calculateProductPrice } from '../services/pricing_service';
 import {z} from 'zod';
 import { app_error_class } from '../middlewares/error_handling_middleware';
+import { AuthRequest } from '../middlewares/auth_middleware';
 
 const productSchema = z.object({
   name: z
@@ -46,7 +47,7 @@ const productSchema = z.object({
   components: z.array(z.object({
     material: z
       .string()
-      .uuid('ID do material inv�lido'),
+      .regex(/^[0-9a-fA-F]{24}$/, 'ID do material inv�lido'),
     quantityType: z
       .enum(['fixed', 'area_based', 'perimeter_based']),
     quantityFactor: z
@@ -63,11 +64,25 @@ const productSchema = z.object({
     .positive('A margem de lucro deve ser um n�mero positivo'),
 })
 
+const querySchema = z.object({
+  page:   z.coerce.number().int().min(1).default(1),
+  limit:  z.coerce.number().int().min(1).max(100).default(20),
+  search: z.string().optional(),
+});
+
 // Get all products
 export const get_all_products = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const products = await Product.find();
-    res.json(products);
+    const { page, limit, search } = querySchema.parse(req.query);
+    const filter = search ? { $text: { $search: search } } : {};
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      Product.find(filter).skip(skip).limit(limit),
+      Product.countDocuments(filter),
+    ]);
+
+    res.json({ data: products, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
   }catch (err: any) {
     return next(err);
   }
@@ -104,7 +119,7 @@ export const create_product = async (req: Request, res: Response, next: NextFunc
     const flatenned = resultado.error.flatten();
       return res.status(400).json({
         success: false,
-        message: 'Dados inválidos para criação de material',
+        message: 'Dados inv�lidos para cria��o de material',
         errors: flatenned.fieldErrors
       });
     }
@@ -119,6 +134,7 @@ export const create_product = async (req: Request, res: Response, next: NextFunc
     components: resultado.data.components,
     baseLaborCost: resultado.data.baseLaborCost,
     profitMargin: resultado.data.profitMargin,
+    createdBy: (req as AuthRequest).userId,
   });
 
   try {
@@ -149,8 +165,8 @@ export const update_product = async (req: Request, res: Response, next: NextFunc
     // O { new: true } diz ao Mongoose para retornar o objeto J� atualizado, n�o o antigo.
     const updateProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      {$set: validation.data},
-      {new: true, runValidators: true} // runValidators garante que as regras do Schema (ex: min length) sejam respeitadas
+      {$set: { ...validation.data, updatedBy: (req as AuthRequest).userId }},
+      {new: true, runValidators: true}
     );
     if (updateProduct == null){
       return next(new app_error_class('Produto n�o encontrado', 404));

@@ -8,7 +8,7 @@ interface Dimensions {
   depth: number;
 }
 
-//calcula o preço de um produto com base nas dimensões e materiais
+//calcula o preï¿½o de um produto com base nas dimensï¿½es e materiais
 
 export const calculateProductPrice = async (productId: string, dimensions: Dimensions, next?: NextFunction) => {
  try {// Busca o produto com os materiais populados
@@ -16,26 +16,26 @@ export const calculateProductPrice = async (productId: string, dimensions: Dimen
   
   const product = await Product.findById(productId).populate('components.material');
   if (!product){
-    const err = new app_error_class('Produto não encontrado', 404);
+    const err = new app_error_class('Produto nï¿½o encontrado', 404);
     if(next) return next(err);
     throw err;
   }
 
-  //Valida as dimensões
+  //Valida as dimensï¿½es
   if (dimensions.height < product.constraints.minHeight || dimensions.height > product.constraints.maxHeight) {
-    return (new app_error_class(`Altura inválida. Mínimo: ${product.constraints.minHeight}, Máximo: ${product.constraints.maxHeight}`, 400));
+    throw new app_error_class(`Altura invï¿½lida. Mï¿½nimo: ${product.constraints.minHeight}, Mï¿½ximo: ${product.constraints.maxHeight}`, 400);
   };
   if (dimensions.width < product.constraints.minWidth || dimensions.width > product.constraints.maxWidth) {
-    return (new app_error_class(`Largura inválida. Mínimo: ${product.constraints.minWidth}, Máximo: ${product.constraints.maxWidth}`, 400));
+    throw new app_error_class(`Largura invï¿½lida. Mï¿½nimo: ${product.constraints.minWidth}, Mï¿½ximo: ${product.constraints.maxWidth}`, 400);
   };
   if (dimensions.depth < product.constraints.minDepth || dimensions.depth > product.constraints.maxDepth) {
-    return (new app_error_class(`Profundidade inválida. Mínimo: ${product.constraints.minDepth}, Máximo: ${product.constraints.maxDepth}`, 400));
+    throw new app_error_class(`Profundidade invï¿½lida. Mï¿½nimo: ${product.constraints.minDepth}, Mï¿½ximo: ${product.constraints.maxDepth}`, 400);
   };
 
   //calcula o custo dos materiais
   let totalMaterialCost = 0;
-  const area = dimensions.height * dimensions.width / 1000000; // área em m2
-  const perimeter = 2 * (dimensions.height + dimensions.width) / 1000; // perímetro em metros
+  const area = dimensions.height * dimensions.width / 1000000; // ï¿½rea em m2
+  const perimeter = 2 * (dimensions.height + dimensions.width) / 1000; // perï¿½metro em metros
 
   const technicalSheet = [];
 
@@ -70,7 +70,7 @@ export const calculateProductPrice = async (productId: string, dimensions: Dimen
     });
   }
 
-  //preço final
+  //preï¿½o final
   const totalBaseCost = totalMaterialCost + product.baseLaborCost;
   const finalPrice = totalBaseCost * (1 + product.profitMargin / 100);
 
@@ -84,6 +84,6 @@ export const calculateProductPrice = async (productId: string, dimensions: Dimen
     }
     });
   } catch (err) {
-    return(err);
+    throw err;
   }
 }
