@@ -9,4 +9,6 @@ test-results/
 .cursor/rules/Rebuilt.mdc
 .CHANGELOG.md
 .claude/
-
+.specify/ 
+specs/
+.playwright/
