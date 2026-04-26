@@ -90,4 +90,5 @@ Every controller validates with `zod.safeParse()` before touching the database. 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
+at [specs/002-admin-panel-jwt/plan.md](specs/002-admin-panel-jwt/plan.md)
 <!-- SPECKIT END -->
