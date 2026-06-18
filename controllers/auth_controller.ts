@@ -4,68 +4,35 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { app_error_class } from '../middlewares/error_handling_middleware';
+import { sendValidationError } from '../lib/validation';
 
-
-//user validation schema zod
 const userSchema = z.object({
   name: z
-    .string({ error: "O nome È obrigatÛrio" })
+    .string({ error: 'O nome √© obrigat√≥rio' })
     .min(3, 'O nome deve conter pelo menos 3 caracteres'),
   email: z
     .string()
-    .min(1, { message: 'O campo "Email" È obrigatÛrio' })
-    .email("Formato de email inv·lido"),
+    .min(1, { message: 'O campo "Email" √© obrigat√≥rio' })
+    .email('Formato de email inv√°lido'),
   password: z
-    .string({ error: "A senha È obrigatÛria" })
-    .min(8, { message: 'A senha deve conter no mÌnimo 8 caracteres' })
-    .max(32, { message: 'A senha deve conter no m·ximo 32 caracteres' })
-    .refine((password) => /[A-Z]/.test(password), { message: 'A senha deve conter pelo menos uma letra mai˙scula' })
-    .refine((password) => /[a-z]/.test(password), { message: 'A senha deve conter pelo menos uma letra min˙scula' })
-    .refine((password) => /[0-9]/.test(password), { message: 'A senha deve conter pelo menos um n˙mero' })
-    .refine((password) => /[!@#$%^&*(),.?":{}|<>]/.test(password), { message: 'A senha deve conter pelo menos um caractere especial' }),
-})
+    .string({ error: 'A senha √© obrigat√≥ria' })
+    .min(8, { message: 'A senha deve conter no m√≠nimo 8 caracteres' })
+    .max(32, { message: 'A senha deve conter no m√°ximo 32 caracteres' })
+    .refine((p) => /[A-Z]/.test(p), { message: 'A senha deve conter pelo menos uma letra mai√∫scula' })
+    .refine((p) => /[a-z]/.test(p), { message: 'A senha deve conter pelo menos uma letra min√∫scula' })
+    .refine((p) => /[0-9]/.test(p), { message: 'A senha deve conter pelo menos um n√∫mero' })
+    .refine((p) => /[!@#$%^&*(),.?":{}|<>]/.test(p), { message: 'A senha deve conter pelo menos um caractere especial' }),
+});
 
-const updatePasswordSchema = z
-  .object({
-    newPassword: userSchema.shape.password,
-    confirmPassword: z
-      .string()
-  });
+const updatePasswordSchema = z.object({
+  newPassword: userSchema.shape.password,
+  confirmPassword: z.string(),
+});
 
-//create user
-export const create_user = async (req: Request, res: Response, next: NextFunction) => {
-  const result = userSchema.safeParse(req.body);
-
-  if (!result.success) {
-    const flatenned = result.error.flatten();
-    return res.status(400).json({
-      success: false,
-      message: 'Dados inv·lidos para criaÁ„o de usu·rio',
-      errors: flatenned.fieldErrors
-    });
-  }
-  const user = new User(result.data);
-
-  try {
-    await user.save();
-    res.status(201).json({ _id: user._id, name: user.name, email: user.email });
-  } catch (err: any) {
-    if (err.code === 11000) {
-      return next(new app_error_class('Email j· cadastrado', 409));
-    }
-  }
-
-}
-//login user
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   const validation = userSchema.pick({ email: true, password: true }).safeParse(req.body);
   if (!validation.success) {
-    const flatenned = validation.error.flatten();
-    return res.status(400).json({
-      success: false,
-      message: 'Dados inv·lidos para login',
-      errors: flatenned.fieldErrors
-    });
+    return sendValidationError(res, validation.error, 'Dados inv√°lidos para login');
   }
   const { email, password } = validation.data;
 
@@ -82,35 +49,23 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      return next(new app_error_class('JWT_SECRET n„o est· definido', 422));
+      return next(new app_error_class('JWT_SECRET n√£o est√° definido', 500));
     }
 
-    const token = jwt.sign(
-      { id: user._id, role: 'user' },
-      secret,
-      { expiresIn: '1d' }
-    );
+    const token = jwt.sign({ id: user._id, role: 'user' }, secret, { expiresIn: '1d' });
 
     return res.json({ token, userId: user._id });
   } catch (err) {
-    return next(err); // Passa para o error handler global
+    return next(err);
   }
 };
 
-
-//update_password
 export const update_password = async (req: Request, res: Response, next: NextFunction) => {
   const validation = updatePasswordSchema.safeParse(req.body);
   const userId = (req as any).userId;
 
-
   if (!validation.success) {
-    const flatenet = validation.error.flatten();
-    return res.status(400).json({
-      success: false,
-      message: 'Dados inv·lidos para atualizaÁ„o de senha',
-      errors: flatenet.fieldErrors
-    });
+    return sendValidationError(res, validation.error, 'Dados inv√°lidos para atualiza√ß√£o de senha');
   }
 
   const { newPassword, confirmPassword } = validation.data;
@@ -118,17 +73,17 @@ export const update_password = async (req: Request, res: Response, next: NextFun
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return next(new app_error_class('Usu·rio n„o encontrado', 404));
+      return next(new app_error_class('Usu√°rio n√£o encontrado', 404));
+    }
+
+    if (newPassword !== confirmPassword) {
+      return next(new app_error_class('A senha de confirma√ß√£o n√£o corresponde √† nova senha', 400));
     }
 
     const isSameAsOldPassword = await bcrypt.compare(newPassword, user.password);
     if (isSameAsOldPassword) {
-      return next(new app_error_class('A nova senha n„o pode ser igual a senha atual', 400));
+      return next(new app_error_class('A nova senha n√£o pode ser igual √† senha atual', 400));
     }
-
-    if (newPassword !== confirmPassword) {
-      return next(new app_error_class('A senha de confirmaÁ„o n„o corresponde ‡ nova senha', 400));
-    };
 
     user.password = newPassword;
     await user.save();

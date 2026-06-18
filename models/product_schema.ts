@@ -1,51 +1,57 @@
-import mongoose, {Schema, Document} from 'mongoose'
+import mongoose, { Schema, Document } from "mongoose";
 
-const componentSchema = new mongoose.Schema({
-  material: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Material',
-    required: true
+const componentSchema = new mongoose.Schema(
+  {
+    material: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Material",
+      required: true,
+    },
+    // O marceneiro define: "Para este m�vel, gasto X unidades deste material por cada m2 de �rea frontal"
+    // ou "Gasto X unidades fixas independente do tamanho
+    quantityType: {
+      type: String,
+      enum: ["fixed", "area_based", "perimeter_based"],
+      required: true,
+    },
+    quantityFactor: {
+      type: Number,
+      required: true,
+    },
   },
-  // O marceneiro define: "Para este m�vel, gasto X unidades deste material por cada m2 de �rea frontal"
-  // ou "Gasto X unidades fixas independente do tamanho
-  quantityType:{
-    type: String,
-    enum:[ 'fixed', 'area_based', 'perimeter_based'],
-    required: true
+  { _id: false },
+);
+
+const productSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    photos: [{ type: String }],
+    isFeatured: { type: Boolean, default: false },
+
+    constraints: {
+      minHeight: { type: Number, required: true },
+      maxHeight: { type: Number, required: true },
+      minWidth: { type: Number, required: true },
+      maxWidth: { type: Number, required: true },
+      minDepth: { type: Number, required: true },
+      maxDepth: { type: Number, required: true },
+    },
+
+    components: [componentSchema],
+
+    baseLaborCost: { type: Number, required: true }, //M�o de obra base
+    profitMargin: { type: Number, default: 50, min: 0, max: 300 }, // margem de lucro em  %
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
-  quantityFactor:{
-    type: Number,
-    required: true,
-  }
-}, {_id: false});
-
-const productSchema = new mongoose.Schema({
-  name: {type: String, required: true},
-  description: {type: String, required: true},
-  photos: [{type: String}],
-  isFeatured: {type: Boolean, default: false},
-
-  constraints: {
-    minHeight: {type: Number, required: true},
-    maxHeight: {type: Number, required: true},
-    minWidth: {type: Number, required: true},
-    maxWidth: {type: Number, required: true},
-    minDepth: {type: Number, required: true},
-    maxDepth: {type: Number, required: true},
-  },
-
-  components: [componentSchema],
-
-  baseLaborCost: {type: Number, required: true}, //M�o de obra base
-  profitMargin: {type: Number, default: 50}, // margem de lucro em  %
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-}, {timestamps: true})
+  { timestamps: true },
+);
 
 export interface IProduct extends Document {
   name: string;
   description: string;
-  constraints:{
+  constraints: {
     minHeight: number;
     maxHeight: number;
     minWidth: number;
@@ -55,7 +61,7 @@ export interface IProduct extends Document {
   };
   components: Array<{
     material: mongoose.Types.ObjectId;
-    quantityType: 'fixed' | 'area_based' | 'perimeter_based';
+    quantityType: "fixed" | "area_based" | "perimeter_based";
     quantityFactor: number;
   }>;
   baseLaborCost: number;
@@ -64,7 +70,6 @@ export interface IProduct extends Document {
   isFeatured: boolean;
 }
 
+productSchema.index({ name: "text", description: "text" });
 
-productSchema.index({ name: 'text', description: 'text' });
-
-export default mongoose.model<IProduct>('Product', productSchema)
+export default mongoose.model<IProduct>("Product", productSchema);

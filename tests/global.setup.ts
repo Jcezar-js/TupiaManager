@@ -7,25 +7,23 @@ export const STATE_FILE = path.join(__dirname, '.auth-state.json');
 
 export const TEST_USER = {
   name: 'Usuario Teste',
-  email: 'test@gauderio.test',
-  password: 'TesteGauderio@123',
+  email: process.env.ADMIN_EMAIL ?? 'test@gauderio.test',
+  password: process.env.ADMIN_PASSWORD ?? 'TesteGauderio@123',
 };
 
 export default async function globalSetup() {
   const ctx = await request.newContext({ baseURL: BASE_URL });
 
-  // Registra usuario de teste — ignora 409 se ja existe
-  const reg = await ctx.post('/api/auth/register', { data: TEST_USER });
-  if (!reg.ok() && reg.status() !== 409) {
-    throw new Error(`Falha ao registrar usuario de teste: ${reg.status()}`);
-  }
-
-  // Login para obter token
   const login = await ctx.post('/api/auth/login', {
     data: { email: TEST_USER.email, password: TEST_USER.password },
   });
+
   if (!login.ok()) {
-    throw new Error(`Falha no login de teste: ${login.status()}`);
+    throw new Error(
+      `globalSetup: login falhou (${login.status()}). ` +
+      `Verifique se ADMIN_EMAIL e ADMIN_PASSWORD no .env correspondem a um usuário existente no banco. ` +
+      `Use 'npx ts-node scripts/create_admin.ts' para criar o usuário admin.`
+    );
   }
 
   const { token, userId } = await login.json();

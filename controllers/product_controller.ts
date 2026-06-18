@@ -1,77 +1,79 @@
-import {Request, Response, NextFunction} from 'express';
-import Product from '../models/product_schema';
-import { calculateProductPrice } from '../services/pricing_service';
-import {z} from 'zod';
-import { app_error_class } from '../middlewares/error_handling_middleware';
-import { AuthRequest } from '../middlewares/auth_middleware';
+import { Request, Response, NextFunction } from "express";
+import Product from "../models/product_schema";
+import { calculateProductPrice } from "../services/pricing_service";
+import { z } from "zod";
+import { app_error_class } from "../middlewares/error_handling_middleware";
+import { AuthRequest } from "../middlewares/auth_middleware";
+import { sendValidationError } from "../lib/validation";
+import { querySchema } from "../lib/query-schema";
 
 const productSchema = z.object({
   name: z
-    .string({ error : "O nome � obrigat�rio"})
-    .min(3, 'O nome deve conter pelo menos 3 caracteres'),
+    .string({ error: "O nome é obrigatório" })
+    .min(3, "O nome deve conter pelo menos 3 caracteres"),
   description: z
-    .string({ error: "A descri��o � obrigat�ria"})
-    .min(10, 'A descri��o deve conter pelo menos 10 caracteres'),
-  photos: z
-    .array(z.string().url())
-    .optional(),
-  isFeatured: z.coerce
-    .boolean()
-    .optional(),
+    .string({ error: "A descrição é obrigatória" })
+    .min(10, "A descrição deve conter pelo menos 10 caracteres"),
+  photos: z.array(z.string().url()).optional(),
+  isFeatured: z.coerce.boolean().optional(),
   constraints: z.object({
-    minHeight: z
-      .coerce
-      .number({error: "A Altura m�nima � obrigat�ria"})
-      .positive('A altura m�nima deve ser um n�mero positivo'),
-    maxHeight: z
-      .coerce
-      .number({error: "A Altura m�xima � obrigat�ria"})
-      .positive('A altura m�xima deve ser um n�mero positivo'),
-    minWidth: z
-      .coerce
-      .number({error: "A largura m�nima � obrigat�ria"})
-      .positive('A largura m�nima deve ser um n�mero positivo'),
-    maxWidth: z
-      .coerce
-      .number({error: "A largura m�xima � obrigat�ria"})
-      .positive('A largura m�xima deve ser um n�mero positivo'),
-    minDepth: z
-      .coerce
-      .number({error: "A profundidade m�nima � obrigat�ria"})
-      .positive('A profundidade m�nima deve ser um n�mero positivo'),
-    maxDepth: z
-      .coerce
-      .number({error: "A profundidade m�xima � obrigat�ria"})
-      .positive('A profundidade m�xima deve ser um n�mero positivo'),
+    minHeight: z.coerce
+      .number({ error: "A Altura mínima é obrigatória" })
+      .positive("A altura mínima deve ser um número positivo"),
+    maxHeight: z.coerce
+      .number({ error: "A Altura máxima é obrigatória" })
+      .positive("A altura máxima deve ser um número positivo"),
+    minWidth: z.coerce
+      .number({ error: "A largura mínima é obrigatória" })
+      .positive("A largura mínima deve ser um número positivo"),
+    maxWidth: z.coerce
+      .number({ error: "A largura máxima é obrigatória" })
+      .positive("A largura máxima deve ser um número positivo"),
+    minDepth: z.coerce
+      .number({ error: "A profundidade mínima é obrigatória" })
+      .positive("A profundidade mínima deve ser um número positivo"),
+    maxDepth: z.coerce
+      .number({ error: "A profundidade máxima é obrigatória" })
+      .positive("A profundidade máxima deve ser um número positivo"),
   }),
-  components: z.array(z.object({
-    material: z
-      .string()
-      .regex(/^[0-9a-fA-F]{24}$/, 'ID do material inv�lido'),
-    quantityType: z
-      .enum(['fixed', 'area_based', 'perimeter_based']),
-    quantityFactor: z
-      .number()
-      .positive('O fator de quantidade deve ser um n�mero positivo'),
-  })),
-  baseLaborCost: z
-    .coerce
-    .number({error: "O custo da m�o de obra base � obrigat�rio"})
-    .positive('O custo da m�o de obra base deve ser um n�mero positivo'),
-  profitMargin: z
-    .coerce
+  components: z.array(
+    z.object({
+      material: z
+        .string()
+        .regex(/^[0-9a-fA-F]{24}$/, "ID do material inválido"),
+      quantityType: z.enum(["fixed", "area_based", "perimeter_based"]),
+      quantityFactor: z
+        .number()
+        .positive("O fator de quantidade deve ser um número positivo"),
+    }),
+  ),
+  baseLaborCost: z.coerce
+    .number({ error: "O custo da mão de obra base é obrigatório" })
+    .positive("O custo da mão de obra base deve ser um número positivo"),
+  profitMargin: z.coerce
     .number()
-    .positive('A margem de lucro deve ser um n�mero positivo'),
-})
-
-const querySchema = z.object({
-  page:   z.coerce.number().int().min(1).default(1),
-  limit:  z.coerce.number().int().min(1).max(100).default(20),
-  search: z.string().optional(),
+    .min(0, "A margem de lucro não pode ser negativa")
+    .max(300, "A margem de lucro não pode ser maior que 300%")
+    .positive("A margem de lucro deve ser um número positivo"),
 });
 
-// Get all products
-export const get_all_products = async (req: Request, res: Response, next: NextFunction) => {
+const dimensionsSchema = z.object({
+  height: z.coerce
+    .number({ error: "A altura é obrigatória" })
+    .positive("A altura deve ser um número positivo"),
+  width: z.coerce
+    .number({ error: "A largura é obrigatória" })
+    .positive("A largura deve ser um número positivo"),
+  depth: z.coerce
+    .number({ error: "A profundidade é obrigatória" })
+    .positive("A profundidade deve ser um número positivo"),
+});
+
+export const get_all_products = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { page, limit, search } = querySchema.parse(req.query);
     const filter = search ? { $text: { $search: search } } : {};
@@ -82,151 +84,125 @@ export const get_all_products = async (req: Request, res: Response, next: NextFu
       Product.countDocuments(filter),
     ]);
 
-    res.json({ data: products, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
-  }catch (err: any) {
+    res.json({
+      data: products,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    });
+  } catch (err: any) {
     return next(err);
   }
-}
-//Get product by ID
-export const get_product_by_id = async (req: Request, res: Response, next: NextFunction) => {
+};
+
+export const get_product_by_id = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product){
-      return next(new app_error_class('Produto n�o encontrado', 404));
+    if (!product) {
+      return next(new app_error_class("Produto não encontrado", 404));
     }
     res.json(product);
-  }catch (err) {
+  } catch (err) {
     return next(err);
   }
-}
-//Create a new product
-export const create_product = async (req: Request, res: Response, next: NextFunction) => {
+};
+
+export const create_product = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const files = req.files as Express.Multer.File[] | undefined;
-  const newPhotos = files?.map(file => file.path) || [];
-  const dataToValidate = {
-    ...req.body,
-    photos: newPhotos
+  const newPhotos = files?.map((file) => file.path) || [];
+
+  const resultado = productSchema.safeParse({ ...req.body, photos: newPhotos });
+  if (!resultado.success) {
+    return sendValidationError(
+      res,
+      resultado.error,
+      "Dados inválidos para criação de produto",
+    );
   }
 
-
-  const resultado = productSchema.safeParse(dataToValidate);
-  if (!resultado.success) {
-    const flatenned = resultado.error.flatten();
-      return res.status(400).json({
-        success: false,
-        message: 'Dados inv�lidos para cria��o de material',
-        errors: flatenned.fieldErrors
-      });
-    }
-
-  
-  const {name, description, photos, isFeatured} = resultado.data;
   const product = new Product({
-    name,
-    description,
-    photos,
-    isFeatured: isFeatured ?? false,
-    constraints: resultado.data.constraints,
-    components: resultado.data.components,
-    baseLaborCost: resultado.data.baseLaborCost,
-    profitMargin: resultado.data.profitMargin,
+    ...resultado.data,
+    isFeatured: resultado.data.isFeatured ?? false,
     createdBy: (req as AuthRequest).userId,
   });
 
   try {
-    const newProduct =  await product.save();
+    const newProduct = await product.save();
     res.status(201).json(newProduct);
-  } catch (err){
+  } catch (err) {
     return next(err);
   }
-}
+};
 
-
-
-//Update an existing product
-export const update_product = async (req: Request, res: Response, next: NextFunction) => {
-  try{
-    //Valida os dados contra o schema
+export const update_product = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
     const validation = productSchema.partial().safeParse(req.body);
     if (!validation.success) {
-      const flatenned = validation.error.flatten();
-      return res.status(400).json({
-        success: false,
-        message: 'Dados inv�lidos para atualiza��o de produto',
-        errors: flatenned.fieldErrors
-      });
+      return sendValidationError(
+        res,
+        validation.error,
+        "Dados inválidos para atualização de produto",
+      );
     }
-  
-    //Valida ID busca e atualiza em tempo real 
-    // O { new: true } diz ao Mongoose para retornar o objeto J� atualizado, n�o o antigo.
-    const updateProduct = await Product.findByIdAndUpdate(
+
+    const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      {$set: { ...validation.data, updatedBy: (req as AuthRequest).userId }},
-      {new: true, runValidators: true}
+      { $set: { ...validation.data, updatedBy: (req as AuthRequest).userId } },
+      { new: true, runValidators: true },
     );
-    if (updateProduct == null){
-      return next(new app_error_class('Produto n�o encontrado', 404));
+    if (!updatedProduct) {
+      return next(new app_error_class("Produto não encontrado", 404));
     }
-    res.json(updateProduct);
-  } catch (err){
+    res.json(updatedProduct);
+  } catch (err) {
     return next(err);
   }
-}
+};
 
-
-  //Delete a product
-
-export const delete_product = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const product = await Product.findByIdAndDelete(req.params.id);
-      if (product == null){
-        return next(new app_error_class('Produto n�o encontrado', 404));
-      }  else {
-        res.json({message: 'Produto deletado com sucesso'});
-      }
-    }catch (err) {
-      return next(err);
+export const delete_product = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) {
+      return next(new app_error_class("Produto não encontrado", 404));
     }
+    res.json({ message: "Produto deletado com sucesso" });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const get_product_quote = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const validation = dimensionsSchema.safeParse(req.body);
+  if (!validation.success) {
+    return sendValidationError(
+      res,
+      validation.error,
+      "Dados inválidos para cálculo de preço",
+    );
   }
 
-
-    export const get_product_quote = async (req: Request, res: Response, next: NextFunction) => {
-    const productId = req.params.id;
-
-    //zod para validar dimens�es enviadas pelo cliente
-
-    const dimensionsSchema = z.object({
-      height: z
-      .coerce
-      .number({error: "A altura � obrigat�ria"})
-      .positive('A altura deve ser um n�mero positivo'),
-      width: z
-      .coerce
-      .number({error: "A largura � obrigat�ria"})
-      .positive('A largura deve ser um n�mero positivo'),
-      depth: z
-      .coerce
-      .number({error: "A profundidade � obrigat�ria"})
-      .positive('A profundidade deve ser um n�mero positivo'),
-    });
-
-    const validation = dimensionsSchema.safeParse(req.body);
-    if (!validation.success){
-      const flatenned = validation.error.flatten();
-      return res.status(400).json({
-        success: false,
-        message: 'Dados inv�lidos para c�lculo de pre�o',
-        errors: flatenned.fieldErrors
-      });
-    }
-
-    try {
-      const quote = await calculateProductPrice (productId, validation.data);
-      res.json(quote);
-    } catch (err) {
-      return next(err);
-    }
-
-  };
-
-  
+  try {
+    const quote = await calculateProductPrice(req.params.id, validation.data);
+    res.json(quote);
+  } catch (err) {
+    return next(err);
+  }
+};

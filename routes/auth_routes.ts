@@ -4,18 +4,18 @@ import {
   login,
   update_password
 } from '../controllers/auth_controller';
-import { rate_limiter, rate_limiter_login } from '../middlewares/rate_limiting';
+import { create_rate_limiter, rate_limiter_login } from '../middlewares/rate_limiting';
 
 
 const auth_router = express.Router();
 
-auth_router.use(rate_limiter);
+auth_router.use(create_rate_limiter());
 
 //Rotas de produto p�blicas
 auth_router.post('/login', rate_limiter_login, login);
 
 //Rotas protegidas
-auth_router.patch('/updatepsw/:id', auth_middleware, update_password);
+auth_router.patch('/updatepsw', auth_middleware, update_password);
 
 
 

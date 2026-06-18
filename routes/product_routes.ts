@@ -9,12 +9,12 @@ import {
   delete_product,
   get_product_quote
 } from '../controllers/product_controller'
-import { rate_limiter } from '../middlewares/rate_limiting';
+import { create_rate_limiter } from '../middlewares/rate_limiting';
 
 const products_router = express.Router();
 
-products_router.use(rate_limiter);
-//Rotas de produto públicas
+products_router.use(create_rate_limiter());
+//Rotas de produto pï¿½blicas
 products_router.get('/', get_all_products);
 products_router.get('/:id', get_product_by_id);
 products_router.post('/quote/:id', get_product_quote);
