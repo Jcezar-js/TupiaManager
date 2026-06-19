@@ -25,6 +25,7 @@ const userSchema = z.object({
 });
 
 const updatePasswordSchema = z.object({
+  currentPassword: z.string().min(1, { message: 'A senha atual é obrigatória' }),
   newPassword: userSchema.shape.password,
   confirmPassword: z.string(),
 });
@@ -68,12 +69,18 @@ export const update_password = async (req: Request, res: Response, next: NextFun
     return sendValidationError(res, validation.error, 'Dados inválidos para atualização de senha');
   }
 
-  const { newPassword, confirmPassword } = validation.data;
+  const { currentPassword, newPassword, confirmPassword } = validation.data;
 
   try {
     const user = await User.findById(userId);
     if (!user) {
       return next(new app_error_class('Usuário não encontrado', 404));
+    }
+
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      console.warn(`[update_password] Tentativa de troca de senha com senha atual incorreta (userId=${userId})`);
+      return next(new app_error_class('A senha atual está incorreta', 400));
     }
 
     if (newPassword !== confirmPassword) {
@@ -88,6 +95,7 @@ export const update_password = async (req: Request, res: Response, next: NextFun
     user.password = newPassword;
     await user.save();
 
+    console.info(`[update_password] Senha alterada com sucesso (userId=${userId})`);
     res.json({ message: 'Senha alterada com sucesso!' });
   } catch (err) {
     return next(err);

@@ -6,6 +6,7 @@ import { LoginPage } from './pages/LoginPage';
 import { MaterialsPage } from './pages/MaterialsPage';
 import { CatalogPage } from './pages/CatalogPage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
+import { ChangePasswordPage } from './pages/ChangePasswordPage';
 const ProductsPage = () => (
   <AdminLayout title="Produtos">
     <div className="card shadow-sm">
@@ -83,6 +84,17 @@ function App() {
         element={
           <ProtectedRoute>
             <ProductsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/change-password"
+        element={
+          <ProtectedRoute>
+            <AdminLayout title="Trocar Senha">
+              <ChangePasswordPage />
+            </AdminLayout>
           </ProtectedRoute>
         }
       />

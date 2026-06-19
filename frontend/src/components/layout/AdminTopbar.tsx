@@ -1,4 +1,5 @@
-import { BsList, BsBellFill, BsPersonCircle } from 'react-icons/bs';
+import { Link } from 'react-router-dom';
+import { BsList, BsBellFill, BsPersonCircle, BsShieldLock } from 'react-icons/bs';
 import { useAuth } from '../../contexts/AuthContext';
 
 const TOPBAR_STYLE: React.CSSProperties = {
@@ -33,6 +34,12 @@ export function AdminTopbar({ title }: AdminTopbarProps) {
       <div className="d-flex align-items-center gap-3">
         <BsBellFill size={16} className="text-secondary" />
         <BsPersonCircle size={20} className="text-white" />
+        <Link
+          to="/admin/change-password"
+          className="btn btn-sm btn-outline-light d-flex align-items-center gap-1"
+        >
+          <BsShieldLock size={14} /> Trocar senha
+        </Link>
         <button className="btn btn-sm btn-outline-light" onClick={logout}>
           Sair
         </button>
