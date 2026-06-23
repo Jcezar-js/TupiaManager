@@ -1,17 +1,23 @@
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { CatalogGrid } from '../components/catalog/CatalogGrid';
 
 export function CatalogPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Catálogo de Produtos</h1>
-          <p className="text-gray-600">Confira nossos produtos e calcule seu orçamento</p>
-        </div>
-      </div>
-      <div className="pb-12">
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ py: 4 }}>
+        <Box sx={{ maxWidth: 1152, mx: 'auto', px: 2 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+            Catálogo de Produtos
+          </Typography>
+          <Typography color="text.secondary">
+            Confira nossos produtos e calcule seu orçamento
+          </Typography>
+        </Box>
+      </Box>
+      <Box sx={{ pb: 6 }}>
         <CatalogGrid />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

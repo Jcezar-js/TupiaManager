@@ -1,59 +1,67 @@
 import { NavLink } from 'react-router-dom';
-import { BsBoxSeam, BsGrid } from 'react-icons/bs';
+import Drawer from '@mui/material/Drawer';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import GridViewIcon from '@mui/icons-material/GridView';
+import { adminColors } from '../../theme';
 
-const SIDEBAR_STYLE: React.CSSProperties = {
-  width: 'var(--admin-sidebar-width)',
-  minHeight: '100vh',
-  backgroundColor: 'var(--admin-sidebar-bg)',
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  zIndex: 1040,
-  display: 'flex',
-  flexDirection: 'column',
-};
+const NAV_ITEMS = [
+  { to: '/admin/materials', label: 'Materiais', icon: <Inventory2Icon fontSize="small" /> },
+  { to: '/admin/products', label: 'Produtos', icon: <GridViewIcon fontSize="small" /> },
+];
 
 export function AdminSidebar() {
   return (
-    <nav style={SIDEBAR_STYLE} className="d-flex flex-column">
-      <div className="px-3 py-4 border-bottom border-secondary">
-        <span className="text-white fw-bold fs-6">NexusAdmin</span>
-      </div>
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: adminColors.sidebarWidth,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: adminColors.sidebarWidth,
+          boxSizing: 'border-box',
+          backgroundColor: adminColors.sidebarBg,
+          color: '#fff',
+          border: 'none',
+        },
+      }}
+    >
+      <Box sx={{ px: 2, py: 2.5, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+          TupiaManager
+        </Typography>
+      </Box>
 
-      <ul className="nav flex-column mt-3 px-2">
-        <li className="nav-item mb-1">
-          <NavLink
-            to="/admin/materials"
-            className={({ isActive }) =>
-              `nav-link d-flex align-items-center gap-2 rounded px-3 py-2 ${
-                isActive ? 'text-white fw-semibold' : 'text-secondary'
-              }`
-            }
-            style={({ isActive }) =>
-              isActive ? { backgroundColor: 'var(--admin-accent)' } : {}
-            }
+      <List component="nav" sx={{ mt: 1, px: 1 }}>
+        {NAV_ITEMS.map((item) => (
+          <ListItemButton
+            key={item.to}
+            component={NavLink}
+            to={item.to}
+            sx={{
+              borderRadius: 1,
+              mb: 0.5,
+              color: 'rgba(255,255,255,0.6)',
+              '&.active': {
+                backgroundColor: 'primary.main',
+                color: '#fff',
+                fontWeight: 600,
+              },
+              '&:hover': {
+                backgroundColor: 'rgba(255,255,255,0.08)',
+              },
+            }}
           >
-            <BsBoxSeam size={16} />
-            Materiais
-          </NavLink>
-        </li>
-        <li className="nav-item mb-1">
-          <NavLink
-            to="/admin/products"
-            className={({ isActive }) =>
-              `nav-link d-flex align-items-center gap-2 rounded px-3 py-2 ${
-                isActive ? 'text-white fw-semibold' : 'text-secondary'
-              }`
-            }
-            style={({ isActive }) =>
-              isActive ? { backgroundColor: 'var(--admin-accent)' } : {}
-            }
-          >
-            <BsGrid size={16} />
-            Produtos
-          </NavLink>
-        </li>
-      </ul>
-    </nav>
+            <ListItemIcon sx={{ color: 'inherit', minWidth: 36 }}>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.label} />
+          </ListItemButton>
+        ))}
+      </List>
+    </Drawer>
   );
 }

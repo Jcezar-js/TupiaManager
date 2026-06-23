@@ -2,7 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
-import { BsHammer } from 'react-icons/bs';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import HandymanIcon from '@mui/icons-material/Handyman';
 import { login } from '../services/auth.service';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -77,89 +85,96 @@ export function LoginPage() {
   };
 
   return (
-    <div className="bg-dark vh-100 d-flex align-items-center justify-content-center p-4">
+    <Box
+      sx={{
+        bgcolor: 'grey.900',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+      }}
+    >
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        style={{ maxWidth: '400px', width: '100%' }}
+        style={{ maxWidth: 400, width: '100%' }}
       >
         <motion.div
           animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
           transition={{ duration: 0.4 }}
-          className="card shadow-lg"
         >
-          <div className="card-body p-5">
-            <motion.div variants={itemVariants} className="text-center mb-4">
-              <BsHammer size={40} className="text-primary mb-2" style={{ margin: '0 auto', display: 'block' }} />
-              <h1 className="card-title h4 fw-bold mb-1">NexusAdmin</h1>
-              <p className="text-muted small">Painel de Administração</p>
-            </motion.div>
-
-            {apiError && (
-              <motion.div variants={itemVariants} className="alert alert-danger alert-dismissible fade show" role="alert">
-                {apiError}
+          <Card elevation={8}>
+            <CardContent sx={{ p: 5 }}>
+              <motion.div variants={itemVariants}>
+                <Box sx={{ textAlign: 'center', mb: 4 }}>
+                  <HandymanIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+                  <Typography component="h1" variant="h5" sx={{ fontWeight: 700 }}>
+                    TupiaManager
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Painel de Administração
+                  </Typography>
+                </Box>
               </motion.div>
-            )}
 
-            <motion.form onSubmit={handleSubmit} variants={itemVariants}>
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label">
-                  Email
-                </label>
-                <input
+              {apiError && (
+                <motion.div variants={itemVariants}>
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {apiError}
+                  </Alert>
+                </motion.div>
+              )}
+
+              <motion.form onSubmit={handleSubmit} variants={itemVariants}>
+                <TextField
                   id="email"
+                  label="Email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`form-control form-control-lg ${errors.email ? 'is-invalid' : ''}`}
                   placeholder="seu@email.com"
                   disabled={loading}
+                  error={!!errors.email}
+                  helperText={errors.email?.[0]}
+                  sx={{ mb: 2 }}
                 />
-                {errors.email && <div className="invalid-feedback d-block">{errors.email[0]}</div>}
-              </div>
 
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label">
-                  Senha
-                </label>
-                <input
+                <TextField
                   id="password"
+                  label="Senha"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`form-control form-control-lg ${errors.password ? 'is-invalid' : ''}`}
                   placeholder="••••••••"
                   disabled={loading}
+                  error={!!errors.password}
+                  helperText={errors.password?.[0]}
+                  sx={{ mb: 3 }}
                 />
-                {errors.password && <div className="invalid-feedback d-block">{errors.password[0]}</div>}
-              </div>
 
-              <motion.button
-                variants={itemVariants}
-                type="submit"
-                disabled={loading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="btn btn-primary w-100 btn-lg"
-              >
-                {loading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Autenticando...
-                  </>
-                ) : (
-                  'Entrar'
-                )}
-              </motion.button>
-            </motion.form>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={18} color="inherit" /> : null}
+                >
+                  {loading ? 'Autenticando...' : 'Entrar'}
+                </Button>
+              </motion.form>
 
-            <motion.p variants={itemVariants} className="text-center text-muted small mt-4">
-              Desenvolvido com ❤️ para NexusAdmin
-            </motion.p>
-          </div>
+              <motion.div variants={itemVariants}>
+                <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
+                  Desenvolvido com ❤️ para TupiaManager
+                </Typography>
+              </motion.div>
+            </CardContent>
+          </Card>
         </motion.div>
       </motion.div>
-    </div>
+    </Box>
   );
 }

@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { z } from 'zod';
-import { BsShieldLock, BsCheckCircleFill } from 'react-icons/bs';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
+import CircularProgress from '@mui/material/CircularProgress';
+import SecurityIcon from '@mui/icons-material/Security';
 import { changePassword } from '../services/auth.service';
 import { ErrorDisplay } from '../components/shared/ErrorDisplay';
 
@@ -71,90 +80,70 @@ export function ChangePasswordPage() {
   };
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-12 col-md-8 col-lg-6">
-        <div className="card shadow-sm">
-          <div className="card-body p-4">
-            <div className="d-flex align-items-center gap-2 mb-4">
-              <BsShieldLock size={22} className="text-primary" />
-              <h5 className="card-title mb-0">Trocar senha</h5>
-            </div>
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Card sx={{ width: '100%', maxWidth: 560 }}>
+        <CardContent sx={{ p: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+            <SecurityIcon color="primary" />
+            <Typography variant="h6">Trocar senha</Typography>
+          </Box>
 
-            {success && (
-              <div className="alert alert-success d-flex align-items-center gap-2 py-2" role="alert">
-                <BsCheckCircleFill /> Senha alterada com sucesso!
-              </div>
-            )}
-            {apiError && (
-              <div className="alert alert-danger py-2" role="alert">
-                {apiError}
-              </div>
-            )}
-            <ErrorDisplay errors={errors} />
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Senha alterada com sucesso!
+            </Alert>
+          )}
+          {apiError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {apiError}
+            </Alert>
+          )}
+          <ErrorDisplay errors={errors} />
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="currentPassword" className="form-label">
-                  Senha atual
-                </label>
-                <input
-                  id="currentPassword"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="form-control"
-                  placeholder="••••••••"
-                  disabled={loading}
-                />
-              </div>
+          <Stack component="form" onSubmit={handleSubmit} spacing={2.5}>
+            <TextField
+              id="currentPassword"
+              label="Senha atual"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="••••••••"
+              disabled={loading}
+            />
 
-              <div className="mb-3">
-                <label htmlFor="newPassword" className="form-label">
-                  Nova senha
-                </label>
-                <input
-                  id="newPassword"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="form-control"
-                  placeholder="••••••••"
-                  disabled={loading}
-                />
-                <div className="form-text">
-                  Mín. 8 caracteres, com maiúscula, minúscula, número e caractere especial.
-                </div>
-              </div>
+            <TextField
+              id="newPassword"
+              label="Nova senha"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="••••••••"
+              disabled={loading}
+              helperText="Mín. 8 caracteres, com maiúscula, minúscula, número e caractere especial."
+            />
 
-              <div className="mb-4">
-                <label htmlFor="confirmPassword" className="form-label">
-                  Confirmar nova senha
-                </label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="form-control"
-                  placeholder="••••••••"
-                  disabled={loading}
-                />
-              </div>
+            <TextField
+              id="confirmPassword"
+              label="Confirmar nova senha"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              disabled={loading}
+            />
 
-              <button type="submit" disabled={loading} className="btn btn-primary w-100">
-                {loading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Salvando...
-                  </>
-                ) : (
-                  'Alterar senha'
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              disabled={loading}
+              startIcon={loading ? <CircularProgress size={18} color="inherit" /> : null}
+            >
+              {loading ? 'Salvando...' : 'Alterar senha'}
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
+    </Box>
   );
 }

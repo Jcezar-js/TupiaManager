@@ -1,6 +1,6 @@
 [
   {
-    "label": "NexusAdmin: dev (back + front)",
+    "label": "TupiaManager: dev (back + front)",
     "command": "npm run dev",
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,

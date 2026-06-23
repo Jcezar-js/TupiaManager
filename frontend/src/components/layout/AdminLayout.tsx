@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
+import Box from '@mui/material/Box';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminTopbar } from './AdminTopbar';
+import { adminColors } from '../../theme';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -8,21 +10,23 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children, title }: AdminLayoutProps) {
-  const contentStyle: React.CSSProperties = {
-    marginLeft: 'var(--admin-sidebar-width)',
-    marginTop: 'var(--admin-topbar-height)',
-    minHeight: 'calc(100vh - var(--admin-topbar-height))',
-    backgroundColor: 'var(--admin-content-bg)',
-    padding: '24px',
-  };
-
   return (
-    <div className="d-flex">
+    <Box sx={{ display: 'flex' }}>
       <AdminSidebar />
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
         <AdminTopbar title={title} />
-        <main style={contentStyle}>{children}</main>
-      </div>
-    </div>
+        <Box
+          component="main"
+          sx={{
+            mt: `${adminColors.topbarHeight}px`,
+            minHeight: `calc(100vh - ${adminColors.topbarHeight}px)`,
+            backgroundColor: 'background.default',
+            p: 3,
+          }}
+        >
+          {children}
+        </Box>
+      </Box>
+    </Box>
   );
 }

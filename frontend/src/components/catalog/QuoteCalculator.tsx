@@ -1,6 +1,24 @@
 import { useState } from 'react';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
+import Table from '@mui/material/Table';
+import TableHead from '@mui/material/TableHead';
+import TableBody from '@mui/material/TableBody';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import Divider from '@mui/material/Divider';
+import Stack from '@mui/material/Stack';
 import { productService } from '../../services/product.service';
 import type { Product, Quote, QuoteRequest } from '../../types/index';
+
+const formatBRL = (value: number) =>
+  value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
 export function QuoteCalculator({ product }: { product: Product }) {
   const [height, setHeight] = useState('');
@@ -37,134 +55,112 @@ export function QuoteCalculator({ product }: { product: Product }) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-6">Calcular Orçamento</h2>
+    <Box sx={{ width: '100%', maxWidth: 672, mx: 'auto', px: 2, py: 4 }}>
+      <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
+        Calcular Orçamento
+      </Typography>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Altura (mm)
-            </label>
-            <input
+      <Paper component="form" onSubmit={handleSubmit} sx={{ p: 3, mb: 3 }}>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              label="Altura (mm)"
               type="number"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
               placeholder="Ex: 1800"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              helperText={`Mín: ${product.constraints.minHeight}mm | Máx: ${product.constraints.maxHeight}mm`}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Mínimo: {product.constraints.minHeight}mm | Máximo: {product.constraints.maxHeight}mm
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Largura (mm)
-            </label>
-            <input
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              label="Largura (mm)"
               type="number"
               value={width}
               onChange={(e) => setWidth(e.target.value)}
               placeholder="Ex: 900"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              helperText={`Mín: ${product.constraints.minWidth}mm | Máx: ${product.constraints.maxWidth}mm`}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Mínimo: {product.constraints.minWidth}mm | Máximo: {product.constraints.maxWidth}mm
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Profundidade (mm)
-            </label>
-            <input
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              label="Profundidade (mm)"
               type="number"
               value={depth}
               onChange={(e) => setDepth(e.target.value)}
               placeholder="Ex: 500"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              helperText={`Mín: ${product.constraints.minDepth}mm | Máx: ${product.constraints.maxDepth}mm`}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Mínimo: {product.constraints.minDepth}mm | Máximo: {product.constraints.maxDepth}mm
-            </p>
-          </div>
-        </div>
+          </Grid>
+        </Grid>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+          <Alert severity="error" sx={{ mb: 2 }}>
             {error}
-          </div>
+          </Alert>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-        >
+        <Button type="submit" variant="contained" fullWidth disabled={loading}>
           {loading ? 'Calculando...' : 'Calcular Orçamento'}
-        </button>
-      </form>
+        </Button>
+      </Paper>
 
       {quote && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
-            <p className="text-sm text-gray-600 mb-1">Preço Final</p>
-            <p className="text-3xl font-bold text-green-700">
-              R$ {quote.finalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </p>
-          </div>
+        <Paper sx={{ p: 3 }}>
+          <Box sx={{ mb: 3, p: 2, bgcolor: 'success.light', borderRadius: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Preço Final
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: 'success.dark' }}>
+              R$ {formatBRL(quote.finalPrice)}
+            </Typography>
+          </Box>
 
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">Ficha Técnica</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="text-left py-2 px-3 font-semibold">Material</th>
-                    <th className="text-right py-2 px-3 font-semibold">Quantidade</th>
-                    <th className="text-left py-2 px-3 font-semibold">Unidade</th>
-                    <th className="text-right py-2 px-3 font-semibold">Custo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quote.details.technicalSheet.map((item, idx) => (
-                    <tr key={idx} className="border-b border-gray-200">
-                      <td className="py-2 px-3">{item.materialName}</td>
-                      <td className="text-right py-2 px-3">{item.quantityConsumed}</td>
-                      <td className="py-2 px-3">{item.unit}</td>
-                      <td className="text-right py-2 px-3">
-                        R$ {parseFloat(item.cost).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Ficha Técnica
+          </Typography>
+          <TableContainer sx={{ mb: 3 }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Material</TableCell>
+                  <TableCell align="right">Quantidade</TableCell>
+                  <TableCell>Unidade</TableCell>
+                  <TableCell align="right">Custo</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {quote.details.technicalSheet.map((item, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell>{item.materialName}</TableCell>
+                    <TableCell align="right">{item.quantityConsumed}</TableCell>
+                    <TableCell>{item.unit}</TableCell>
+                    <TableCell align="right">R$ {formatBRL(parseFloat(item.cost))}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-          <div className="border-t border-gray-200 pt-4 space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Total de Materiais:</span>
-              <span className="font-semibold">
-                R$ {quote.details.totalMaterialCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Mão de Obra:</span>
-              <span className="font-semibold">
-                R$ {quote.details.laborCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Lucro:</span>
-              <span className="font-semibold">
-                R$ {quote.details.profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-          </div>
-        </div>
+          <Divider sx={{ mb: 2 }} />
+          <Stack spacing={1}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography color="text.secondary">Total de Materiais:</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                R$ {formatBRL(quote.details.totalMaterialCost)}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography color="text.secondary">Mão de Obra:</Typography>
+              <Typography sx={{ fontWeight: 600 }}>R$ {formatBRL(quote.details.laborCost)}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography color="text.secondary">Lucro:</Typography>
+              <Typography sx={{ fontWeight: 600 }}>R$ {formatBRL(quote.details.profit)}</Typography>
+            </Box>
+          </Stack>
+        </Paper>
       )}
-    </div>
+    </Box>
   );
 }

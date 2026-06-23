@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { productService } from '../../services/product.service';
 import type { Product } from '../../types/index';
 import { ProductCard } from './ProductCard';
@@ -35,42 +39,42 @@ export function CatalogGrid() {
   };
 
   if (loading && products.length === 0) {
-    return <div className="text-center py-8">Carregando produtos...</div>;
+    return (
+      <Typography align="center" sx={{ py: 8 }}>
+        Carregando produtos...
+      </Typography>
+    );
   }
 
   if (!loading && products.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">Nenhum produto disponível</p>
-      </div>
+      <Typography align="center" color="text.secondary" sx={{ py: 12 }}>
+        Nenhum produto disponível
+      </Typography>
     );
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4">
-      <div className="mb-6">
-        <input
-          type="text"
+    <Box sx={{ width: '100%', maxWidth: 1152, mx: 'auto', px: 2 }}>
+      <Box sx={{ mb: 3 }}>
+        <TextField
           placeholder="Buscar produtos..."
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-      </div>
+      </Box>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <Grid key={product._id} size={{ xs: 12, sm: 6, lg: 4 }}>
+            <ProductCard product={product} />
+          </Grid>
         ))}
-      </div>
+      </Grid>
 
       {totalPages > 1 && (
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
       )}
-    </div>
+    </Box>
   );
 }

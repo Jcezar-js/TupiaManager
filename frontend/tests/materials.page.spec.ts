@@ -67,7 +67,7 @@ test.describe('Materials Page Routing', () => {
     await expect(navbar).toBeVisible();
 
     // Title should be visible
-    const title = page.locator('text=NexusAdmin');
+    const title = page.locator('text=TupiaManager');
     await expect(title).toBeVisible();
   });
 

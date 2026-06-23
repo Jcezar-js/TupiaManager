@@ -6,7 +6,7 @@ test.describe('Login Page', () => {
   });
 
   test('should display login form', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('NexusAdmin');
+    await expect(page.locator('h1')).toContainText('TupiaManager');
     await expect(page.locator('text=Painel de Administração')).toBeVisible();
     await expect(page.locator('input[placeholder="seu@email.com"]')).toBeVisible();
     await expect(page.locator('input[placeholder="••••••••"]')).toBeVisible();

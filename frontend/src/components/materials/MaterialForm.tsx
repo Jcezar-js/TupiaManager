@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Alert from '@mui/material/Alert';
 import { materialService } from '../../services/material.service';
 import type { Material, MaterialFormData } from '../../types/material';
 import { MaterialFormSchema, MATERIAL_CATEGORIES, MATERIAL_UNITS } from '../../types/material';
@@ -79,102 +87,84 @@ export function MaterialForm({ initialData, onSuccess }: MaterialFormProps) {
   };
 
   return (
-    <div className="card shadow-sm" style={{ maxWidth: '520px' }}>
-      <div className="card-body">
-        <h5 className="card-title">{id ? 'Editar Material' : 'Novo Material'}</h5>
+    <Card sx={{ maxWidth: 520 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          {id ? 'Editar Material' : 'Novo Material'}
+        </Typography>
 
-        {generalError && <div className="alert alert-danger">{generalError}</div>}
+        {generalError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {generalError}
+          </Alert>
+        )}
 
         <ErrorDisplay errors={errors} />
 
-        <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
-          <div>
-            <label htmlFor="name" className="form-label">
-              Nome
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="form-control"
-            />
-          </div>
+        <Stack component="form" onSubmit={handleSubmit} spacing={2.5}>
+          <TextField
+            id="name"
+            label="Nome"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
 
-          <div>
-            <label htmlFor="category" className="form-label">
-              Categoria
-            </label>
-            <select
-              id="category"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-              className="form-select"
-            >
-              {MATERIAL_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <TextField
+            id="category"
+            label="Categoria"
+            select
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+          >
+            {MATERIAL_CATEGORIES.map((cat) => (
+              <MenuItem key={cat} value={cat}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </MenuItem>
+            ))}
+          </TextField>
 
-          <div>
-            <label htmlFor="unit" className="form-label">
-              Unidade
-            </label>
-            <select
-              id="unit"
-              value={formData.unit}
-              onChange={(e) => setFormData({ ...formData, unit: e.target.value as any })}
-              className="form-select"
-            >
-              {MATERIAL_UNITS.map((unit) => (
-                <option key={unit} value={unit}>
-                  {unit}
-                </option>
-              ))}
-            </select>
-          </div>
+          <TextField
+            id="unit"
+            label="Unidade"
+            select
+            value={formData.unit}
+            onChange={(e) => setFormData({ ...formData, unit: e.target.value as any })}
+          >
+            {MATERIAL_UNITS.map((unit) => (
+              <MenuItem key={unit} value={unit}>
+                {unit}
+              </MenuItem>
+            ))}
+          </TextField>
 
-          <div>
-            <label htmlFor="price" className="form-label">
-              Preço por Unidade (R$)
-            </label>
-            <input
-              id="price"
-              type="number"
-              step="0.01"
-              value={formData.pricePerUnit}
-              onChange={(e) => setFormData({ ...formData, pricePerUnit: parseFloat(e.target.value) || 0 })}
-              className="form-control"
-            />
-          </div>
+          <TextField
+            id="price"
+            label="Preço por Unidade (R$)"
+            type="number"
+            slotProps={{ htmlInput: { step: '0.01' } }}
+            value={formData.pricePerUnit}
+            onChange={(e) => setFormData({ ...formData, pricePerUnit: parseFloat(e.target.value) || 0 })}
+          />
 
-          <div>
-            <label htmlFor="waste" className="form-label">
-              Fator de Desperdício
-            </label>
-            <input
-              id="waste"
-              type="number"
-              step="0.01"
-              value={formData.wasteFactor}
-              onChange={(e) => setFormData({ ...formData, wasteFactor: parseFloat(e.target.value) || 1.1 })}
-              className="form-control"
-            />
-          </div>
+          <TextField
+            id="waste"
+            label="Fator de Desperdício"
+            type="number"
+            slotProps={{ htmlInput: { step: '0.01' } }}
+            value={formData.wasteFactor}
+            onChange={(e) => setFormData({ ...formData, wasteFactor: parseFloat(e.target.value) || 1.1 })}
+          />
 
-          <div className="d-flex gap-2">
-            <button type="submit" disabled={loading} className="btn btn-primary">
+          <Stack direction="row" spacing={1}>
+            <Button type="submit" variant="contained" disabled={loading}>
               {loading ? 'Salvando...' : 'Salvar'}
-            </button>
-            <button type="button" onClick={() => navigate('/admin/materials')} className="btn btn-secondary">
+            </Button>
+            <Button type="button" variant="outlined" color="inherit" onClick={() => navigate('/admin/materials')}>
               Cancelar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            </Button>
+          </Stack>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }

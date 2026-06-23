@@ -1,5 +1,9 @@
 import type { ReactNode } from 'react';
-import { Modal as BsModal, Button } from 'react-bootstrap';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 
 interface ModalProps {
   isOpen: boolean;
@@ -21,19 +25,17 @@ export function Modal({
   cancelText = 'Cancelar',
 }: ModalProps) {
   return (
-    <BsModal show={isOpen} onHide={onCancel} centered>
-      <BsModal.Header closeButton>
-        <BsModal.Title>{title}</BsModal.Title>
-      </BsModal.Header>
-      <BsModal.Body>{body}</BsModal.Body>
-      <BsModal.Footer>
-        <Button variant="secondary" onClick={onCancel}>
+    <Dialog open={isOpen} onClose={onCancel} maxWidth="sm" fullWidth>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent dividers>{body}</DialogContent>
+      <DialogActions>
+        <Button color="inherit" onClick={onCancel}>
           {cancelText}
         </Button>
-        <Button variant="danger" onClick={onConfirm}>
+        <Button color="error" variant="contained" onClick={onConfirm}>
           {confirmText}
         </Button>
-      </BsModal.Footer>
-    </BsModal>
+      </DialogActions>
+    </Dialog>
   );
 }

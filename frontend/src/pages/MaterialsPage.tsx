@@ -7,16 +7,8 @@ export function MaterialsPage() {
   const isNew = window.location.pathname.includes('/new');
 
   if (isNew || id) {
-    return (
-      <div className="p-6">
-        <MaterialForm />
-      </div>
-    );
+    return <MaterialForm />;
   }
 
-  return (
-    <div className="p-6">
-      <MaterialList />
-    </div>
-  );
+  return <MaterialList />;
 }

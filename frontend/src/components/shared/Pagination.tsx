@@ -1,4 +1,5 @@
-import { Pagination as BsPagination } from 'react-bootstrap';
+import Box from '@mui/material/Box';
+import MuiPagination from '@mui/material/Pagination';
 
 interface PaginationProps {
   page: number;
@@ -8,12 +9,13 @@ interface PaginationProps {
 
 export function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
   return (
-    <div className="d-flex justify-content-center mt-3">
-      <BsPagination>
-        <BsPagination.Prev onClick={() => onPageChange(page - 1)} disabled={page <= 1} />
-        <BsPagination.Item active>{page}</BsPagination.Item>
-        <BsPagination.Next onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} />
-      </BsPagination>
-    </div>
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+      <MuiPagination
+        page={page}
+        count={totalPages}
+        color="primary"
+        onChange={(_, value) => onPageChange(value)}
+      />
+    </Box>
   );
 }

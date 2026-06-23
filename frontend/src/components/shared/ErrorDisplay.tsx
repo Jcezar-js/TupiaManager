@@ -1,3 +1,7 @@
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+
 interface ErrorDisplayProps {
   errors: Record<string, string[]>;
 }
@@ -8,17 +12,19 @@ export function ErrorDisplay({ errors }: ErrorDisplayProps) {
   }
 
   return (
-    <div className="alert alert-danger py-2">
+    <Alert severity="error" sx={{ mb: 2 }}>
       {Object.entries(errors).map(([field, messages]) => (
-        <div key={field}>
-          <p className="mb-0 fw-semibold text-capitalize">{field}</p>
+        <Box key={field} sx={{ mb: 0.5 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, textTransform: 'capitalize' }}>
+            {field}
+          </Typography>
           {messages.map((msg, idx) => (
-            <p key={idx} className="mb-0 small">
+            <Typography key={idx} variant="caption" component="p">
               • {msg}
-            </p>
+            </Typography>
           ))}
-        </div>
+        </Box>
       ))}
-    </div>
+    </Alert>
   );
 }

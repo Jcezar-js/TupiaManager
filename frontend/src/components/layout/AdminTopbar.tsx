@@ -1,16 +1,16 @@
 import { Link } from 'react-router-dom';
-import { BsList, BsBellFill, BsPersonCircle, BsShieldLock } from 'react-icons/bs';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LockResetIcon from '@mui/icons-material/LockReset';
 import { useAuth } from '../../contexts/AuthContext';
-
-const TOPBAR_STYLE: React.CSSProperties = {
-  height: 'var(--admin-topbar-height)',
-  backgroundColor: 'var(--admin-topbar-bg)',
-  position: 'fixed',
-  top: 0,
-  left: 'var(--admin-sidebar-width)',
-  right: 0,
-  zIndex: 1030,
-};
+import { adminColors } from '../../theme';
 
 interface AdminTopbarProps {
   title: string;
@@ -20,30 +20,44 @@ export function AdminTopbar({ title }: AdminTopbarProps) {
   const { logout } = useAuth();
 
   return (
-    <header
-      style={TOPBAR_STYLE}
-      className="d-flex align-items-center justify-content-between px-4 border-bottom border-secondary"
+    <AppBar
+      position="fixed"
+      elevation={0}
+      sx={{
+        height: adminColors.topbarHeight,
+        backgroundColor: adminColors.topbarBg,
+        left: adminColors.sidebarWidth,
+        width: `calc(100% - ${adminColors.sidebarWidth}px)`,
+      }}
     >
-      <div className="d-flex align-items-center gap-3">
-        <button className="btn btn-sm btn-outline-secondary border-0 text-white p-1" aria-label="Toggle sidebar">
-          <BsList size={20} />
-        </button>
-        <span className="text-white fw-semibold">{title}</span>
-      </div>
+      <Toolbar variant="dense" sx={{ height: '100%', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <IconButton size="small" sx={{ color: '#fff' }} aria-label="Toggle sidebar">
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            {title}
+          </Typography>
+        </Box>
 
-      <div className="d-flex align-items-center gap-3">
-        <BsBellFill size={16} className="text-secondary" />
-        <BsPersonCircle size={20} className="text-white" />
-        <Link
-          to="/admin/change-password"
-          className="btn btn-sm btn-outline-light d-flex align-items-center gap-1"
-        >
-          <BsShieldLock size={14} /> Trocar senha
-        </Link>
-        <button className="btn btn-sm btn-outline-light" onClick={logout}>
-          Sair
-        </button>
-      </div>
-    </header>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <NotificationsIcon fontSize="small" sx={{ color: 'rgba(255,255,255,0.6)' }} />
+          <AccountCircleIcon sx={{ color: '#fff' }} />
+          <Button
+            component={Link}
+            to="/admin/change-password"
+            size="small"
+            variant="outlined"
+            color="inherit"
+            startIcon={<LockResetIcon />}
+          >
+            Trocar senha
+          </Button>
+          <Button size="small" variant="outlined" color="inherit" onClick={logout}>
+            Sair
+          </Button>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }

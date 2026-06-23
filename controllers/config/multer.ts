@@ -10,7 +10,7 @@ cloudinary.config({
 
 const storage = CloudinaryStorage({
   cloudinary,
-  folder: 'nexus-admin-produtos',
+  folder: 'tupia-manager-produtos',
   allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   public_id: (_req: any, file: any) => file.originalname.split('.')[0] + '-' + Date.now(),
 });

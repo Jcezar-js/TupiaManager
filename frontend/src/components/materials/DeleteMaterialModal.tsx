@@ -1,4 +1,11 @@
 import { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import type { Material } from '../../types/material';
 import type { Product } from '../../types';
 import { Modal } from '../shared/Modal';
@@ -39,34 +46,37 @@ export function DeleteMaterialModal({ isOpen, material, onConfirm, onCancel }: D
   if (!material) return null;
 
   const body = (
-    <div className="space-y-4">
+    <Box>
       {loading ? (
-        <p>Verificando uso do material...</p>
+        <Typography>Verificando uso do material...</Typography>
       ) : affectedProducts.length > 0 ? (
         <>
-          <p className="text-red-600 font-semibold">Este material é utilizado pelos seguintes produtos:</p>
-          <ul className="list-disc list-inside space-y-1">
+          <Typography color="error" sx={{ fontWeight: 600 }}>
+            Este material é utilizado pelos seguintes produtos:
+          </Typography>
+          <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
             {affectedProducts.map((product) => (
-              <li key={product._id}>{product.name}</li>
+              <ListItem key={product._id} sx={{ display: 'list-item', py: 0 }} disableGutters>
+                <ListItemText primary={product.name} />
+              </ListItem>
             ))}
-          </ul>
-          <p className="text-sm text-gray-600">Deseja confirmar a exclusão mesmo assim?</p>
+          </List>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Deseja confirmar a exclusão mesmo assim?
+          </Typography>
           {!confirmed && (
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={confirmed}
-                onChange={(e) => setConfirmed(e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-sm">Sim, tenho certeza de que desejo deletar este material</span>
-            </label>
+            <FormControlLabel
+              control={
+                <Checkbox checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
+              }
+              label="Sim, tenho certeza de que desejo deletar este material"
+            />
           )}
         </>
       ) : (
-        <p>Tem certeza que deseja deletar este material?</p>
+        <Typography>Tem certeza que deseja deletar este material?</Typography>
       )}
-    </div>
+    </Box>
   );
 
   return (

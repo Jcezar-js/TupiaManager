@@ -1,4 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
 import { AdminLayout } from './components/layout/AdminLayout';
 import { useAuth } from './contexts/AuthContext';
@@ -9,12 +12,14 @@ import { ProductDetailPage } from './pages/ProductDetailPage';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
 const ProductsPage = () => (
   <AdminLayout title="Produtos">
-    <div className="card shadow-sm">
-      <div className="card-body">
-        <h5 className="card-title">Produtos</h5>
-        <p className="text-muted">Em breve</p>
-      </div>
-    </div>
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Produtos
+        </Typography>
+        <Typography color="text.secondary">Em breve</Typography>
+      </CardContent>
+    </Card>
   </AdminLayout>
 );
 

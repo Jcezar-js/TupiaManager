@@ -1,6 +1,20 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BsPlusCircle } from 'react-icons/bs';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Alert from '@mui/material/Alert';
+import Table from '@mui/material/Table';
+import TableHead from '@mui/material/TableHead';
+import TableBody from '@mui/material/TableBody';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import Stack from '@mui/material/Stack';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import type { Material } from '../../types/material';
 import { materialService } from '../../services/material.service';
 import { Pagination } from '../shared/Pagination';
@@ -74,74 +88,91 @@ export function MaterialList() {
   };
 
   if (loading && materials.length === 0) {
-    return <div className="text-center py-4">Carregando...</div>;
+    return (
+      <Typography align="center" sx={{ py: 4 }}>
+        Carregando...
+      </Typography>
+    );
   }
 
   return (
-    <div className="card shadow-sm">
-      <div className="card-body">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="card-title mb-0">Materiais</h5>
-          <button
+    <Card>
+      <CardContent>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h6">Materiais</Typography>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<AddCircleIcon />}
             onClick={() => navigate('/admin/materials/new')}
-            className="btn btn-primary btn-sm d-flex align-items-center gap-2"
           >
-            <BsPlusCircle size={16} /> Novo Material
-          </button>
-        </div>
+            Novo Material
+          </Button>
+        </Box>
 
-        <input
-          type="text"
+        <TextField
           placeholder="Buscar material..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="form-control mb-3"
+          sx={{ mb: 2 }}
         />
 
-        {error && <div className="alert alert-danger mb-3">{error}</div>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
-        <div className="table-responsive">
-          <table className="table table-hover table-bordered align-middle mb-0">
-            <thead className="table-dark">
-              <tr>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Unidade</th>
-                <th className="text-end">Preço</th>
-                <th className="text-end">Desperdício</th>
-                <th className="text-center">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Nome</TableCell>
+                <TableCell>Categoria</TableCell>
+                <TableCell>Unidade</TableCell>
+                <TableCell align="right">Preço</TableCell>
+                <TableCell align="right">Desperdício</TableCell>
+                <TableCell align="center">Ações</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {materials.map((material) => (
-                <tr key={material._id}>
-                  <td>{material.name}</td>
-                  <td>{CATEGORY_LABELS[material.category]}</td>
-                  <td>{UNIT_LABELS[material.unit]}</td>
-                  <td className="text-end">R$ {material.pricePerUnit.toFixed(2)}</td>
-                  <td className="text-end">{material.wasteFactor.toFixed(2)}x</td>
-                  <td className="text-center">
-                    <button
-                      onClick={() => navigate(`/admin/materials/${material._id}/edit`)}
-                      className="btn btn-warning btn-sm me-2"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => setDeleteModal({ material, open: true })}
-                      className="btn btn-danger btn-sm"
-                    >
-                      Deletar
-                    </button>
-                  </td>
-                </tr>
+                <TableRow key={material._id} hover>
+                  <TableCell>{material.name}</TableCell>
+                  <TableCell>{CATEGORY_LABELS[material.category]}</TableCell>
+                  <TableCell>{UNIT_LABELS[material.unit]}</TableCell>
+                  <TableCell align="right">R$ {material.pricePerUnit.toFixed(2)}</TableCell>
+                  <TableCell align="right">{material.wasteFactor.toFixed(2)}x</TableCell>
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="warning"
+                        onClick={() => navigate(`/admin/materials/${material._id}/edit`)}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="error"
+                        onClick={() => setDeleteModal({ material, open: true })}
+                      >
+                        Deletar
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
 
         {materials.length === 0 && !loading && (
-          <div className="text-center py-4 text-muted">Nenhum material encontrado</div>
+          <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
+            Nenhum material encontrado
+          </Typography>
         )}
 
         <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
@@ -152,7 +183,7 @@ export function MaterialList() {
           onConfirm={handleDelete}
           onCancel={() => setDeleteModal({ material: null!, open: false })}
         />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
