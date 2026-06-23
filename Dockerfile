@@ -9,6 +9,7 @@ RUN npm ci
 # Copia o código e compila apenas o backend (tsconfig.build.json exclui frontend)
 COPY tsconfig.json tsconfig.build.json ./
 COPY server.ts app.ts ./
+COPY lib ./lib
 COPY routes ./routes
 COPY controllers ./controllers
 COPY models ./models
