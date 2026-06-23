@@ -8,6 +8,17 @@ import helmet from 'helmet';
 
 const app = express();
 
+// Confia no proxy reverso (Fly/Render/Cloudflare) para que req.ip use o
+// X-Forwarded-For real. Sem isso o rate-limiter agrupa todos sob um único IP
+// ou pode ser burlado via spoof do header. Ajustar TRUST_PROXY ao número de
+// hops: 1 = um proxy (ex.: Fly), 2 = Cloudflare + Fly, etc. Ausente = desligado
+// (correto em dev local sem proxy).
+const trust_proxy = process.env.TRUST_PROXY;
+if (trust_proxy !== undefined) {
+  const numeric = Number(trust_proxy);
+  app.set('trust proxy', Number.isNaN(numeric) ? trust_proxy : numeric);
+}
+
 //origens permitidas CORS
 const allowed_origins = process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:12000', 'http://localhost:12001'];
 

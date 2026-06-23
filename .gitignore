@@ -1,5 +1,10 @@
 .env
 node_modules
+dist/
+.firebase/
+firebase-debug.log
+.agents/
+skills-lock.json
 tests/.auth-state.json
 playwright-report/
 .playwright/

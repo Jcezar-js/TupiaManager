@@ -13,7 +13,7 @@ export function create_rate_limiter() {
 }
 
 export const rate_limiter_login = rateLimit({
-  windowMs: 5 * 10 * 1000,
+  windowMs: 5 * 60 * 1000,
   max: 5,
   handler: (_req: Request, _res: Response, next: NextFunction) => {
     next(new app_error_class('Muitas tentativas de login, por favor tente novamente mais tarde.', 429));

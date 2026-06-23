@@ -1,20 +1,22 @@
 {
-  "name": "nexus-admin",
+  "name": "tupia-manager",
   "version": "1.0.0",
-  "description": "NexusAdmin - Pricing engine and administrative system for furniture quotes",
-  "homepage": "https://github.com/Jcezar-js/nexus-admin#readme",
+  "description": "TupiaManager - Pricing engine and administrative system for furniture quotes",
+  "homepage": "https://github.com/Jcezar-js/MARCENARIA_DO_GAUDERIO#readme",
   "bugs": {
-    "url": "https://github.com/Jcezar-js/nexus-admin/issues"
+    "url": "https://github.com/Jcezar-js/MARCENARIA_DO_GAUDERIO/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jcezar-js/nexus-admin.git"
+    "url": "git+https://github.com/Jcezar-js/MARCENARIA_DO_GAUDERIO.git"
   },
   "license": "ISC",
   "author": "",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
     "devStart": "ts-node-dev --respawn --transpile-only server.ts",
     "dev": "concurrently --kill-others --names \"back,front\" --prefix-colors \"cyan,magenta\" \"npm:devStart\" \"npm --prefix frontend run dev\"",
     "test": "playwright test",
@@ -24,16 +26,17 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "cloudinary": "^1.21.0",
+    "cloudinary": "^2.10.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.1",
+    "firebase": "^12.15.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.20.1",
     "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^4.0.0",
+    "multer-storage-cloudinary": "^2.2.1",
     "zod": "^4.1.12"
   },
   "devDependencies": {
