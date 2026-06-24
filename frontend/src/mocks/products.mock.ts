@@ -7,7 +7,7 @@ export const MOCK_PRODUCTS: Product[] = [
     description: 'Prateleira moderna em madeira com suporte em alumínio',
     category: 'Móvel',
     photos: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop'],
-    isActive: true,
+    isActive: true, isMock: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     constraints: {
@@ -39,7 +39,7 @@ export const MOCK_PRODUCTS: Product[] = [
     description: 'Porta em vidro 8mm com acabamento polido',
     category: 'Acessório',
     photos: ['https://images.unsplash.com/photo-1508087305259-7aa3ca92bbb1?w=400&h=300&fit=crop'],
-    isActive: true,
+    isActive: true, isMock: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     constraints: {
@@ -66,7 +66,7 @@ export const MOCK_PRODUCTS: Product[] = [
     description: 'Gaveta completa com guia soft-close importada',
     category: 'Móvel',
     photos: ['https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop'],
-    isActive: true,
+    isActive: true, isMock: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     constraints: {
