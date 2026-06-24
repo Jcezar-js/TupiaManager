@@ -41,6 +41,7 @@ export interface Product {
   description: string;
   photos: string[];
   isFeatured: boolean;
+  isActive?: boolean;
   constraints: ProductConstraints;
   components: Component[];
   baseLaborCost: number;
@@ -55,6 +56,7 @@ export interface ProductStep1Data {
   name: string;
   description: string;
   isFeatured: boolean;
+  isActive?: boolean;
   constraints: ProductConstraints;
   baseLaborCost: number | '';
   profitMargin: number | '';
