@@ -1,17 +1,22 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import Alert from '@mui/material/Alert';
-import { materialService } from '../../services/material.service';
-import type { Material, MaterialFormData } from '../../types/material';
-import { MaterialFormSchema, MATERIAL_CATEGORIES, MATERIAL_UNITS } from '../../types/material';
-import { ErrorDisplay } from '../shared/ErrorDisplay';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import Alert from "@mui/material/Alert";
+import { materialService } from "../../services/material.service";
+import type { Material, MaterialFormData } from "../../types/material";
+import {
+  MaterialFormSchema,
+  MATERIAL_CATEGORIES,
+  MATERIAL_UNITS,
+} from "../../types/material";
+import { ErrorDisplay } from "../shared/ErrorDisplay";
+import { isApiError } from "@/services/api";
 
 interface MaterialFormProps {
   initialData?: Material;
@@ -22,18 +27,19 @@ export function MaterialForm({ initialData, onSuccess }: MaterialFormProps) {
   const navigate = useNavigate();
   const { id } = useParams();
   const [formData, setFormData] = useState<MaterialFormData>({
-    name: '',
-    category: 'madeira',
-    unit: 'metro',
+    name: "",
+    category: "madeira",
+    unit: "metro",
     pricePerUnit: 0,
     wasteFactor: 1.1,
   });
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
-  const [generalError, setGeneralError] = useState('');
+  const [generalError, setGeneralError] = useState("");
 
   useEffect(() => {
     if (initialData) {
+  // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         name: initialData.name,
         category: initialData.category,
@@ -57,7 +63,7 @@ export function MaterialForm({ initialData, onSuccess }: MaterialFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    setGeneralError('');
+    setGeneralError("");
 
     const result = MaterialFormSchema.safeParse(formData);
     if (!result.success) {
@@ -72,14 +78,22 @@ export function MaterialForm({ initialData, onSuccess }: MaterialFormProps) {
       } else {
         await materialService.createMaterial(result.data);
       }
-      setFormData({ name: '', category: 'madeira', unit: 'metro', pricePerUnit: 0, wasteFactor: 1.1 });
+      setFormData({
+        name: "",
+        category: "madeira",
+        unit: "metro",
+        pricePerUnit: 0,
+        wasteFactor: 1.1,
+      });
       onSuccess?.();
-      navigate('/admin/materials');
-    } catch (err: any) {
-      if (err.fieldErrors) {
+      navigate("/admin/materials");
+    } catch (err) {
+      if (isApiError(err) && err.fieldErrors) {
         setErrors(err.fieldErrors);
       } else {
-        setGeneralError(err.message || 'Erro ao salvar material');
+        setGeneralError(
+          err instanceof Error ? err.message : "Erro ao salvar material",
+        );
       }
     } finally {
       setLoading(false);
@@ -90,7 +104,7 @@ export function MaterialForm({ initialData, onSuccess }: MaterialFormProps) {
     <Card sx={{ maxWidth: 520 }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          {id ? 'Editar Material' : 'Novo Material'}
+          {id ? "Editar Material" : "Novo Material"}
         </Typography>
 
         {generalError && (
@@ -114,7 +128,13 @@ export function MaterialForm({ initialData, onSuccess }: MaterialFormProps) {
             label="Categoria"
             select
             value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                category: e.target
+                  .value as (typeof MATERIAL_CATEGORIES)[number],
+              })
+            }
           >
             {MATERIAL_CATEGORIES.map((cat) => (
               <MenuItem key={cat} value={cat}>
@@ -128,7 +148,12 @@ export function MaterialForm({ initialData, onSuccess }: MaterialFormProps) {
             label="Unidade"
             select
             value={formData.unit}
-            onChange={(e) => setFormData({ ...formData, unit: e.target.value as any })}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                unit: e.target.value as (typeof MATERIAL_UNITS)[number],
+              })
+            }
           >
             {MATERIAL_UNITS.map((unit) => (
               <MenuItem key={unit} value={unit}>
@@ -141,25 +166,40 @@ export function MaterialForm({ initialData, onSuccess }: MaterialFormProps) {
             id="price"
             label="Preço por Unidade (R$)"
             type="number"
-            slotProps={{ htmlInput: { step: '0.01' } }}
+            slotProps={{ htmlInput: { step: "0.01" } }}
             value={formData.pricePerUnit}
-            onChange={(e) => setFormData({ ...formData, pricePerUnit: parseFloat(e.target.value) || 0 })}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                pricePerUnit: parseFloat(e.target.value) || 0,
+              })
+            }
           />
 
           <TextField
             id="waste"
             label="Fator de Desperdício"
             type="number"
-            slotProps={{ htmlInput: { step: '0.01' } }}
+            slotProps={{ htmlInput: { step: "0.01" } }}
             value={formData.wasteFactor}
-            onChange={(e) => setFormData({ ...formData, wasteFactor: parseFloat(e.target.value) || 1.1 })}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                wasteFactor: parseFloat(e.target.value) || 1.1,
+              })
+            }
           />
 
           <Stack direction="row" spacing={1}>
             <Button type="submit" variant="contained" disabled={loading}>
-              {loading ? 'Salvando...' : 'Salvar'}
+              {loading ? "Salvando..." : "Salvar"}
             </Button>
-            <Button type="button" variant="outlined" color="inherit" onClick={() => navigate('/admin/materials')}>
+            <Button
+              type="button"
+              variant="outlined"
+              color="inherit"
+              onClick={() => navigate("/admin/materials")}
+            >
               Cancelar
             </Button>
           </Stack>

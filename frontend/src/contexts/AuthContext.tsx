@@ -1,35 +1,18 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { AuthState } from '../types/index';
-
-interface AuthContextType extends AuthState {
-  login: (token: string) => void;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-function decodeToken(token: string): string | null {
-  try {
-    const payload = token.split('.')[1];
-    const decoded = JSON.parse(atob(payload));
-    return decoded.id || null;
-  } catch {
-    return null;
-  }
-}
+import { AuthContext, decodeToken } from './useAuth';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>({ token: null, userId: null });
-  const navigate = useNavigate();
-
-  useEffect(() => {
+  const [state, setState] = React.useState<AuthState>(() => {
     const token = sessionStorage.getItem('auth_token');
     if (token) {
       const userId = decodeToken(token);
-      setState({ token, userId });
+      return { token, userId };
     }
-  }, []);
+    return { token: null, userId: null };
+  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleLogout = () => {
@@ -61,10 +44,3 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-}

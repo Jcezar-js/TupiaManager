@@ -1,0 +1,95 @@
+import type { Product } from '../types/index';
+
+export const MOCK_PRODUCTS: Product[] = [
+  {
+    _id: 'mock-1',
+    name: 'Prateleira Flutuante',
+    description: 'Prateleira moderna em madeira com suporte em alumínio',
+    category: 'Móvel',
+    photos: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop'],
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    constraints: {
+      minHeight: 200,
+      maxHeight: 2500,
+      minWidth: 300,
+      maxWidth: 3000,
+      minDepth: 150,
+      maxDepth: 500,
+    },
+    components: [
+      {
+        material: '65a1f2c8d7b3e9f2c4k1l2m3',
+        quantityType: 'fixed',
+        quantityFactor: 2,
+      },
+      {
+        material: '65a1f2c8d7b3e9f2c4k1l2m4',
+        quantityType: 'area_based',
+        quantityFactor: 1,
+      },
+    ],
+    baseLaborCost: 150,
+    profitMargin: 35,
+  },
+  {
+    _id: 'mock-2',
+    name: 'Porta de Vidro Temperado',
+    description: 'Porta em vidro 8mm com acabamento polido',
+    category: 'Acessório',
+    photos: ['https://images.unsplash.com/photo-1508087305259-7aa3ca92bbb1?w=400&h=300&fit=crop'],
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    constraints: {
+      minHeight: 500,
+      maxHeight: 2200,
+      minWidth: 400,
+      maxWidth: 1200,
+      minDepth: 0,
+      maxDepth: 10,
+    },
+    components: [
+      {
+        material: '65a1f2c8d7b3e9f2c4k1l2m5',
+        quantityType: 'area_based',
+        quantityFactor: 1,
+      },
+    ],
+    baseLaborCost: 200,
+    profitMargin: 40,
+  },
+  {
+    _id: 'mock-3',
+    name: 'Gaveta com Corrediça Suave',
+    description: 'Gaveta completa com guia soft-close importada',
+    category: 'Móvel',
+    photos: ['https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop'],
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    constraints: {
+      minHeight: 100,
+      maxHeight: 400,
+      minWidth: 200,
+      maxWidth: 1000,
+      minDepth: 300,
+      maxDepth: 600,
+    },
+    components: [
+      {
+        material: '65a1f2c8d7b3e9f2c4k1l2m3',
+        quantityType: 'perimeter_based',
+        quantityFactor: 1,
+      },
+      {
+        material: '65a1f2c8d7b3e9f2c4k1l2m6',
+        quantityType: 'fixed',
+        quantityFactor: 1,
+      },
+    ],
+    baseLaborCost: 100,
+    profitMargin: 30,
+  },
+];

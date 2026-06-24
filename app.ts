@@ -20,7 +20,7 @@ if (trust_proxy !== undefined) {
 }
 
 //origens permitidas CORS
-const allowed_origins = process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:12000', 'http://localhost:12001'];
+const allowed_origins = process.env.CORS_ORIGINS?.split(',') ?? (process.env.NODE_ENV === 'production' ? ['https://tupiamanager.web.app'] : ['http://localhost:12000', 'http://localhost:12001']);
 
 const options: cors.CorsOptions = {
   origin: allowed_origins,

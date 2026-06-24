@@ -15,6 +15,7 @@ import TableContainer from '@mui/material/TableContainer';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import { productService } from '../../services/product.service';
+import { isApiError } from '../../services/api';
 import type { Product, Quote, QuoteRequest } from '../../types/index';
 
 const formatBRL = (value: number) =>
@@ -47,7 +48,7 @@ export function QuoteCalculator({ product }: { product: Product }) {
       };
       const result = await productService.getProductQuote(product._id, dimensions);
       setQuote(result);
-    } catch (err: any) {
+      setError(isApiError(err) ? (err.message || 'Erro ao calcular orçamento') : 'Erro ao calcular orçamento');
       setError(err.message || 'Erro ao calcular orçamento');
     } finally {
       setLoading(false);

@@ -4,7 +4,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
 import { AdminLayout } from './components/layout/AdminLayout';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './contexts/useAuth';
 import { LoginPage } from './pages/LoginPage';
 import { MaterialsPage } from './pages/MaterialsPage';
 import { CatalogPage } from './pages/CatalogPage';

@@ -9,7 +9,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LockResetIcon from '@mui/icons-material/LockReset';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import { adminColors } from '../../theme';
 
 interface AdminTopbarProps {

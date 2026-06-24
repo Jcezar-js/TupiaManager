@@ -7,6 +7,7 @@ import { productService } from '../../services/product.service';
 import type { Product } from '../../types/index';
 import { ProductCard } from './ProductCard';
 import { Pagination } from '../shared/Pagination';
+import { MOCK_PRODUCTS } from '../../mocks/products.mock';
 
 export function CatalogGrid() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -24,7 +25,9 @@ export function CatalogGrid() {
         setTotalPages(response.pagination.pages);
       } catch (err) {
         console.error('Failed to fetch products:', err);
-        setProducts([]);
+        // Use mock data as fallback
+        setProducts(MOCK_PRODUCTS);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }

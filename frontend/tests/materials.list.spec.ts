@@ -102,8 +102,6 @@ test.describe('Materials List', () => {
     const count = await editButton.count();
 
     if (count > 0) {
-      const materialRow = editButton.locator('..').locator('..');
-      const materialName = await materialRow.locator('td').first().textContent();
 
       await editButton.click();
       await page.waitForURL('**/admin/materials/*/edit');

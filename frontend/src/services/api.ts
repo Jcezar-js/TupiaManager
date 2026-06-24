@@ -1,6 +1,6 @@
 import type { ApiError } from "../types/index";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://tupiamanager-api.onrender.com' : 'http://localhost:3001');
 
 export async function apiFetch<T>(
   path: string,
@@ -35,11 +35,11 @@ export async function apiFetch<T>(
         success: false,
         message: `HTTP ${response.status}: ${response.statusText}`,
       };
-      throw new ApiRequestError(errorData.message, {
-        status: response.status,
-        fieldErrors: errorData.errors,
-      });
     }
+    throw new ApiRequestError(errorData.message, {
+      status: response.status,
+      fieldErrors: errorData.errors,
+    });
   }
 
   return response.json();

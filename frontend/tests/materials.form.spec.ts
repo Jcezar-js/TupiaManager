@@ -116,7 +116,6 @@ test.describe('Material Form', () => {
     const count = await editButton.count();
 
     if (count > 0) {
-      const originalName = await editButton.locator('..').locator('..').locator('td').first().textContent();
 
       await editButton.click();
       await page.waitForURL('**/admin/materials/*/edit');
