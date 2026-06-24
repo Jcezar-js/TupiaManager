@@ -1,41 +1,41 @@
-import { useState } from 'react';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
-import TableBody from '@mui/material/TableBody';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
-import { productService } from '../../services/product.service';
-import { isApiError } from '../../services/api';
-import type { Product, Quote, QuoteRequest } from '../../types/index';
+import { useState } from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import { productService } from "../../services/product.service";
+import { isApiError } from "../../services/api";
+import type { Product, Quote, QuoteRequest } from "../../types/index";
 
 const formatBRL = (value: number) =>
-  value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
 
 export function QuoteCalculator({ product }: { product: Product }) {
-  const [height, setHeight] = useState('');
-  const [width, setWidth] = useState('');
-  const [depth, setDepth] = useState('');
+  const [height, setHeight] = useState("");
+  const [width, setWidth] = useState("");
+  const [depth, setDepth] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setQuote(null);
 
     if (!height || !width || !depth) {
-      setError('Preencha todas as dimensões');
+      setError("Preencha todas as dimensões");
       return;
     }
 
@@ -46,17 +46,24 @@ export function QuoteCalculator({ product }: { product: Product }) {
         width: Number(width),
         depth: Number(depth),
       };
-      const result = await productService.getProductQuote(product._id, dimensions);
+      const result = await productService.getProductQuote(
+        product._id,
+        dimensions,
+      );
       setQuote(result);
-      setError(isApiError(err) ? (err.message || 'Erro ao calcular orçamento') : 'Erro ao calcular orçamento');
-      setError(err.message || 'Erro ao calcular orçamento');
+    } catch (err) {
+      setError(
+        isApiError(err)
+          ? err.message || "Erro ao calcular orçamento"
+          : "Erro ao calcular orçamento",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 672, mx: 'auto', px: 2, py: 4 }}>
+    <Box sx={{ width: "100%", maxWidth: 672, mx: "auto", px: 2, py: 4 }}>
       <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
         Calcular Orçamento
       </Typography>
@@ -102,17 +109,20 @@ export function QuoteCalculator({ product }: { product: Product }) {
         )}
 
         <Button type="submit" variant="contained" fullWidth disabled={loading}>
-          {loading ? 'Calculando...' : 'Calcular Orçamento'}
+          {loading ? "Calculando..." : "Calcular Orçamento"}
         </Button>
       </Paper>
 
       {quote && (
         <Paper sx={{ p: 3 }}>
-          <Box sx={{ mb: 3, p: 2, bgcolor: 'success.light', borderRadius: 1 }}>
+          <Box sx={{ mb: 3, p: 2, bgcolor: "success.light", borderRadius: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Preço Final
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: 'success.dark' }}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700, color: "success.dark" }}
+            >
               R$ {formatBRL(quote.finalPrice)}
             </Typography>
           </Box>
@@ -136,7 +146,9 @@ export function QuoteCalculator({ product }: { product: Product }) {
                     <TableCell>{item.materialName}</TableCell>
                     <TableCell align="right">{item.quantityConsumed}</TableCell>
                     <TableCell>{item.unit}</TableCell>
-                    <TableCell align="right">R$ {formatBRL(parseFloat(item.cost))}</TableCell>
+                    <TableCell align="right">
+                      R$ {formatBRL(parseFloat(item.cost))}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -145,19 +157,25 @@ export function QuoteCalculator({ product }: { product: Product }) {
 
           <Divider sx={{ mb: 2 }} />
           <Stack spacing={1}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography color="text.secondary">Total de Materiais:</Typography>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Typography color="text.secondary">
+                Total de Materiais:
+              </Typography>
               <Typography sx={{ fontWeight: 600 }}>
                 R$ {formatBRL(quote.details.totalMaterialCost)}
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography color="text.secondary">Mão de Obra:</Typography>
-              <Typography sx={{ fontWeight: 600 }}>R$ {formatBRL(quote.details.laborCost)}</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                R$ {formatBRL(quote.details.laborCost)}
+              </Typography>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography color="text.secondary">Lucro:</Typography>
-              <Typography sx={{ fontWeight: 600 }}>R$ {formatBRL(quote.details.profit)}</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                R$ {formatBRL(quote.details.profit)}
+              </Typography>
             </Box>
           </Stack>
         </Paper>

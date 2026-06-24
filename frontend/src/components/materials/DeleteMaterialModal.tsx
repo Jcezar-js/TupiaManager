@@ -6,7 +6,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import type { Material, Component } from "../../types/material";
+import type { Material } from "../../types/material";
+import type { Component } from "../../types";
 import type { Product } from "../../types";
 import { Modal } from "../shared/Modal";
 
@@ -29,7 +30,7 @@ export function DeleteMaterialModal({
 
   useEffect(() => {
     if (!isOpen || !material) {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAffectedProducts([]);
       setConfirmed(false);
       return;
@@ -37,11 +38,15 @@ export function DeleteMaterialModal({
 
     setLoading(true);
     // Fetch public products endpoint to check for in-use materials
-    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/products`)
+    fetch(
+      `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/products`,
+    )
       .then((res) => res.json())
       .then((result) => {
         const affected = result.data.filter((product: Product) =>
-          product.components.some((c: Component) => c.material === material._id),
+          product.components.some(
+            (c: Component) => c.material === material._id,
+          ),
         );
         setAffectedProducts(affected);
       })
