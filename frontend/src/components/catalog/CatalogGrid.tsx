@@ -1,19 +1,18 @@
-import { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import { productService } from '../../services/product.service';
-import type { Product } from '../../types/index';
-import { ProductCard } from './ProductCard';
-import { Pagination } from '../shared/Pagination';
-import { MOCK_PRODUCTS } from '../../mocks/products.mock';
+import { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { productService } from "../../services/product.service";
+import type { Product } from "../../types/index";
+import { ProductCard } from "./ProductCard";
+import { Pagination } from "../shared/Pagination";
 
 export function CatalogGrid() {
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -24,9 +23,7 @@ export function CatalogGrid() {
         setProducts(response.data);
         setTotalPages(response.pagination.pages);
       } catch (err) {
-        console.error('Failed to fetch products:', err);
-        // Use mock data as fallback
-        setProducts(MOCK_PRODUCTS);
+        console.error("Failed to fetch products:", err);
         setTotalPages(1);
       } finally {
         setLoading(false);
@@ -58,7 +55,7 @@ export function CatalogGrid() {
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 1152, mx: 'auto', px: 2 }}>
+    <Box sx={{ width: "100%", maxWidth: 1152, mx: "auto", px: 2 }}>
       <Box sx={{ mb: 3 }}>
         <TextField
           placeholder="Buscar produtos..."
@@ -76,7 +73,11 @@ export function CatalogGrid() {
       </Grid>
 
       {totalPages > 1 && (
-        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       )}
     </Box>
   );
