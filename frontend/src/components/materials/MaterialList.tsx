@@ -1,40 +1,41 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Alert from '@mui/material/Alert';
-import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
-import TableBody from '@mui/material/TableBody';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import Stack from '@mui/material/Stack';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import type { Material } from '../../types/material';
-import { materialService } from '../../services/material.service';
-import { Pagination } from '../shared/Pagination';
-import { DeleteMaterialModal } from './DeleteMaterialModal';
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Alert from "@mui/material/Alert";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import Stack from "@mui/material/Stack";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import type { Material } from "../../types/material";
+import { materialService } from "../../services/material.service";
+import { Pagination } from "../shared/Pagination";
+import { DeleteMaterialModal } from "./DeleteMaterialModal";
+import { isApiError } from "@/services/api";
 
 const CATEGORY_LABELS: Record<string, string> = {
-  madeira: 'Madeira',
-  vidro: 'Vidro',
-  metal: 'Metal',
-  plastico: 'Plástico',
-  tecido: 'Tecido',
-  outro: 'Outro',
+  madeira: "Madeira",
+  vidro: "Vidro",
+  metal: "Metal",
+  plastico: "Plástico",
+  tecido: "Tecido",
+  outro: "Outro",
 };
 
 const UNIT_LABELS: Record<string, string> = {
-  metro: 'm',
-  metro2: 'm²',
-  metro3: 'm³',
-  unidade: 'un',
-  kg: 'kg',
+  metro: "m",
+  metro2: "m²",
+  metro3: "m³",
+  unidade: "un",
+  kg: "kg",
 };
 
 export function MaterialList() {
@@ -42,11 +43,14 @@ export function MaterialList() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState('');
-  const [searchDebounce, setSearchDebounce] = useState('');
+  const [search, setSearch] = useState("");
+  const [searchDebounce, setSearchDebounce] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [deleteModal, setDeleteModal] = useState<{ material: Material; open: boolean }>({
+  const [error, setError] = useState("");
+  const [deleteModal, setDeleteModal] = useState<{
+    material: Material;
+    open: boolean;
+  }>({
     material: null!,
     open: false,
   });
@@ -54,12 +58,16 @@ export function MaterialList() {
   const loadMaterials = useCallback(async () => {
     try {
       setLoading(true);
-      const result = await materialService.listMaterials(page, 20, searchDebounce);
+      const result = await materialService.listMaterials(
+        page,
+        20,
+        searchDebounce,
+      );
       setMaterials(result.data);
       setTotalPages(result.pagination.pages);
-      setError('');
-    } catch (err: any) {
-      setError(err.message || 'Erro ao carregar materiais');
+      setError("");
+    } catch (err) {
+      setError(isApiError(err) ? err.message || "fallback" : "fallback");
     } finally {
       setLoading(false);
     }
@@ -74,6 +82,7 @@ export function MaterialList() {
   }, [search]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadMaterials();
   }, [loadMaterials]);
 
@@ -82,8 +91,8 @@ export function MaterialList() {
       await materialService.deleteMaterial(deleteModal.material._id);
       setDeleteModal({ material: null!, open: false });
       loadMaterials();
-    } catch (err: any) {
-      setError(err.message || 'Erro ao deletar material');
+    } catch (err) {
+      setError(isApiError(err) ? err.message || "fallback" : "fallback");
     }
   };
 
@@ -98,13 +107,20 @@ export function MaterialList() {
   return (
     <Card>
       <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
           <Typography variant="h6">Materiais</Typography>
           <Button
             variant="contained"
             size="small"
             startIcon={<AddCircleIcon />}
-            onClick={() => navigate('/admin/materials/new')}
+            onClick={() => navigate("/admin/materials/new")}
           >
             Novo Material
           </Button>
@@ -141,15 +157,25 @@ export function MaterialList() {
                   <TableCell>{material.name}</TableCell>
                   <TableCell>{CATEGORY_LABELS[material.category]}</TableCell>
                   <TableCell>{UNIT_LABELS[material.unit]}</TableCell>
-                  <TableCell align="right">R$ {material.pricePerUnit.toFixed(2)}</TableCell>
-                  <TableCell align="right">{material.wasteFactor.toFixed(2)}x</TableCell>
+                  <TableCell align="right">
+                    R$ {material.pricePerUnit.toFixed(2)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {material.wasteFactor.toFixed(2)}x
+                  </TableCell>
                   <TableCell align="center">
-                    <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ justifyContent: "center" }}
+                    >
                       <Button
                         size="small"
                         variant="contained"
                         color="warning"
-                        onClick={() => navigate(`/admin/materials/${material._id}/edit`)}
+                        onClick={() =>
+                          navigate(`/admin/materials/${material._id}/edit`)
+                        }
                       >
                         Editar
                       </Button>
@@ -175,7 +201,11 @@ export function MaterialList() {
           </Typography>
         )}
 
-        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
 
         <DeleteMaterialModal
           isOpen={deleteModal.open}

@@ -1,19 +1,19 @@
-import type { ApiError } from '../types/index';
+import type { ApiError } from "../types/index";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const url = `${API_URL}${path}`;
-  const token = sessionStorage.getItem('auth_token');
+  const token = sessionStorage.getItem("auth_token");
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
 
-  if (typeof options.headers === 'object' && options.headers !== null) {
+  if (typeof options.headers === "object" && options.headers !== null) {
     Object.assign(headers, options.headers);
   }
 
@@ -27,10 +27,6 @@ export async function apiFetch<T>(
   });
 
   if (!response.ok) {
-    if (response.status === 401) {
-      window.dispatchEvent(new CustomEvent('auth:logout'));
-    }
-
     let errorData: ApiError;
     try {
       errorData = await response.json();
@@ -39,15 +35,30 @@ export async function apiFetch<T>(
         success: false,
         message: `HTTP ${response.status}: ${response.statusText}`,
       };
+      throw new ApiRequestError(errorData.message, {
+        status: response.status,
+        fieldErrors: errorData.errors,
+      });
     }
-
-    const error = new Error(errorData.message) as Error & { status?: number; fieldErrors?: Record<string, string[]> };
-    error.status = response.status;
-    if (errorData.errors) {
-      error.fieldErrors = errorData.errors;
-    }
-    throw error;
   }
 
   return response.json();
+}
+export class ApiRequestError extends Error {
+  status?: number;
+  fieldErrors?: Record<string, string[]>;
+
+  constructor(
+    message: string,
+    options?: { status?: number; fieldErrors?: Record<string, string[]> },
+  ) {
+    super(message);
+    Object.setPrototypeOf(this, ApiRequestError.prototype);
+    this.status = options?.status;
+    this.fieldErrors = options?.fieldErrors;
+  }
+}
+
+export function isApiError(err: unknown): err is ApiRequestError {
+  return err instanceof ApiRequestError;
 }
